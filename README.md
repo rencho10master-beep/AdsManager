@@ -219,7 +219,9 @@ class MyApplication : Application() {
             nativeAdBadgeTextColor = Color.BLACK,                  // "Ad" badge text color
             nativeCtaBgColor = Color.parseColor("#1A73E8"),        // Install button background color
             nativeCtaTextColor = Color.WHITE,                      // Install button text color
-            nativeFontFamily = Typeface.DEFAULT_BOLD               // Custom Typeface / Font
+
+            // 🔤 Font Family from res/font/ folder (e.g. res/font/my_font.ttf)
+            nativeFontResId = R.font.my_font                       // Pass R.font directly!
         )
 
         AdsManager.init(this, config)

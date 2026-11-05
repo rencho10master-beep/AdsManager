@@ -2,6 +2,7 @@ package com.ads.manager
 
 import android.graphics.Color
 import androidx.annotation.ColorInt
+import androidx.annotation.FontRes
 
 data class AdsConfig(
     val appId: String = "",
@@ -31,6 +32,7 @@ data class AdsConfig(
     @param:ColorInt val nativeAdBadgeTextColor: Int? = null,
     @param:ColorInt val nativeCtaBgColor: Int? = null,
     @param:ColorInt val nativeCtaTextColor: Int? = null,
+    @param:FontRes val nativeFontResId: Int? = null,
     val nativeFontFamily: android.graphics.Typeface? = null,
     val nativeFontFamilyName: String? = null
 )

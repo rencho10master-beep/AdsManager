@@ -224,11 +224,23 @@ class NativeAdManager(private val config: AdsConfig) {
             adView.setBackgroundColor(bgColor)
         }
 
-        // 2. Typeface / Font Family
+        // 2. Typeface / Font Family (from res/font/, Typeface object, or font name)
         val resolvedTypeface: android.graphics.Typeface? = config.nativeFontFamily
-            ?: config.nativeFontFamilyName?.let {
+            ?: config.nativeFontResId?.let { fontRes ->
                 try {
-                    android.graphics.Typeface.create(it, android.graphics.Typeface.NORMAL)
+                    androidx.core.content.res.ResourcesCompat.getFont(adView.context, fontRes)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            ?: config.nativeFontFamilyName?.let { fontName ->
+                try {
+                    val fontResId = adView.context.resources.getIdentifier(fontName, "font", adView.context.packageName)
+                    if (fontResId != 0) {
+                        androidx.core.content.res.ResourcesCompat.getFont(adView.context, fontResId)
+                    } else {
+                        android.graphics.Typeface.create(fontName, android.graphics.Typeface.NORMAL)
+                    }
                 } catch (_: Exception) {
                     null
                 }

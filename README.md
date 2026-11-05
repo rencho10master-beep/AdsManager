@@ -166,34 +166,75 @@ AdsManager.showInterstitial(this, 3) {
 
 ---
 
-## 🖼️ 7. Native Ads (Medium, Small & Custom XML Layouts)
+## 🖼️ 7. Native Ads (Large / Medium & Small)
 
-### A. Medium Native Ad (with MediaView & Shimmer)
+### Step 1: XML Setup (Activity or Fragment Layout)
+In your XML layout, add a container (`FrameLayout`, `LinearLayout`, or `CardView`):
+
+```xml
+<!-- 1. For Large / Medium Native Ad (around 200dp - 280dp height) -->
+<FrameLayout
+    android:id="@+id/nativeAdContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp" />
+
+<!-- 2. For Small Native Ad (around 60dp - 90dp height) -->
+<FrameLayout
+    android:id="@+id/smallNativeContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp" />
+```
+
+### Step 2: Kotlin Code
+
 ```kotlin
+// A. Large / Medium Native Ad (with MediaView, App Icon, Headline, Body & Shimmer):
 AdsManager.showNative(this, binding.nativeAdContainer)
-```
 
-### B. Small Native Ad (Compact - no MediaView, great for lists / bottom)
-```kotlin
+// B. Small Native Ad (Compact - no MediaView, ideal for bottom or lists):
 AdsManager.showNativeSmall(this, binding.smallNativeContainer)
-```
 
-### C. Your Own Custom Designed XML Layout!
-Create your own XML layout (e.g. `res/layout/my_custom_native_ad.xml`) with any CardView, background, or colors, and pass it:
-```kotlin
+// C. Your Own Custom Designed XML Layout!
 AdsManager.showNative(
     activity = this,
-    container = binding.myContainer, // Any ViewGroup (CardView, LinearLayout, FrameLayout, etc.)
+    container = binding.customContainer,
     customAdLayoutResId = R.layout.my_custom_native_ad
 )
 ```
 
 ---
 
-## 📱 8. Adaptive Banner Ads
+## 📱 8. Banner Ads (Adaptive, Collapsible, Inline & MREC)
+
+### Step 1: XML Setup
+In your XML, add a container at the bottom, top, or inside your list/scroll view:
+
+```xml
+<!-- Sticky Bottom Banner Container -->
+<FrameLayout
+    android:id="@+id/bannerContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom" />
+```
+
+### Step 2: Kotlin Code
 
 ```kotlin
+// 1. Standard Anchored Adaptive Banner (Sticky bottom / top):
 AdsManager.showBanner(this, binding.bannerContainer)
+
+// 2. Collapsible Banner (Expands on display for high CTR, then collapses):
+// Position can be "bottom" (default) or "top"
+AdsManager.showCollapsibleBanner(this, binding.bannerContainer, position = "bottom")
+
+// 3. Inline Adaptive Banner (Inside RecyclerView or ScrollView items):
+AdsManager.showInlineBanner(this, binding.bannerContainer, maxHeightDp = 100)
+
+// 4. Medium Rectangle Banner (MREC 300x250):
+AdsManager.showMediumRectangleBanner(this, binding.bannerContainer)
 ```
 
 ---

@@ -2,6 +2,7 @@ package com.ads.manager.banner
 
 import android.app.Activity
 import android.os.Build
+import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowMetrics
@@ -17,15 +18,82 @@ import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 
 class BannerAdManager(private val config: AdsConfig) {
 
+    /**
+     * Standard Anchored Adaptive Banner (Sticky top/bottom banner).
+     */
     fun showBannerAd(
         activity: Activity,
         container: ViewGroup,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
+        val bannerSize = getAdaptiveBannerSize(activity)
+        loadBannerInternal(activity, container, bannerSize, null, onLoaded, onFailed)
+    }
+
+    /**
+     * Collapsible Banner Ad (Expands when shown and collapses to normal banner).
+     * @param position "bottom" (default) or "top"
+     */
+    fun showCollapsibleBannerAd(
+        activity: Activity,
+        container: ViewGroup,
+        position: String = "bottom",
+        onLoaded: (() -> Unit)? = null,
+        onFailed: (() -> Unit)? = null
+    ) {
+        val bannerSize = getAdaptiveBannerSize(activity)
+        val extras = Bundle().apply {
+            putString("collapsible", position)
+        }
+        loadBannerInternal(activity, container, bannerSize, extras, onLoaded, onFailed)
+    }
+
+    /**
+     * Inline Adaptive Banner Ad (Ideal for RecyclerView items or scrollable content).
+     * @param maxHeightDp Maximum allowable height in dp (default: 100)
+     */
+    fun showInlineBannerAd(
+        activity: Activity,
+        container: ViewGroup,
+        maxHeightDp: Int = 100,
+        onLoaded: (() -> Unit)? = null,
+        onFailed: (() -> Unit)? = null
+    ) {
+        val adWidth = getAdWidthInDp(activity)
+        val bannerSize = AdSize.getInlineAdaptiveBannerAdSize(adWidth, maxHeightDp)
+        loadBannerInternal(activity, container, bannerSize, null, onLoaded, onFailed)
+    }
+
+    /**
+     * Medium Rectangle (MREC) Banner Ad (300x250).
+     */
+    fun showMediumRectangleBannerAd(
+        activity: Activity,
+        container: ViewGroup,
+        onLoaded: (() -> Unit)? = null,
+        onFailed: (() -> Unit)? = null
+    ) {
+        loadBannerInternal(activity, container, AdSize.MEDIUM_RECTANGLE, null, onLoaded, onFailed)
+    }
+
+    private fun loadBannerInternal(
+        activity: Activity,
+        container: ViewGroup,
+        adSize: AdSize,
+        extras: Bundle?,
+        onLoaded: (() -> Unit)?,
+        onFailed: (() -> Unit)?
+    ) {
+        if (config.bannerId.isBlank()) {
+            container.visibility = View.GONE
+            onFailed?.invoke()
+            return
+        }
+
         AdsInitializer.safeInitialize(activity, config.appId)
 
-        if (config.bannerId.isBlank() || !MobileAds.isInitialized) {
+        if (!MobileAds.isInitialized) {
             container.visibility = View.GONE
             onFailed?.invoke()
             return
@@ -35,8 +103,11 @@ class BannerAdManager(private val config: AdsConfig) {
         container.removeAllViews()
         container.addView(adView)
 
-        val bannerSize = getAdaptiveBannerSize(activity)
-        val bannerRequest = BannerAdRequest.Builder(config.bannerId, bannerSize).build()
+        val requestBuilder = BannerAdRequest.Builder(config.bannerId, adSize)
+        if (extras != null) {
+            requestBuilder.setGoogleExtrasBundle(extras)
+        }
+        val bannerRequest = requestBuilder.build()
 
         adView.loadAd(
             bannerRequest,
@@ -62,6 +133,11 @@ class BannerAdManager(private val config: AdsConfig) {
     }
 
     private fun getAdaptiveBannerSize(activity: Activity): AdSize {
+        val adWidth = getAdWidthInDp(activity)
+        return AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, adWidth)
+    }
+
+    private fun getAdWidthInDp(activity: Activity): Int {
         val displayMetrics = activity.resources.displayMetrics
         val adWidthPixels = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             val windowMetrics: WindowMetrics = activity.windowManager.currentWindowMetrics
@@ -70,7 +146,6 @@ class BannerAdManager(private val config: AdsConfig) {
             displayMetrics.widthPixels
         }
         val density = displayMetrics.density
-        val adWidth = (adWidthPixels / density).toInt()
-        return AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, adWidth)
+        return (adWidthPixels / density).toInt()
     }
 }

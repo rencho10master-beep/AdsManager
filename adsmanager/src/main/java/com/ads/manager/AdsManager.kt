@@ -226,6 +226,9 @@ object AdsManager {
         nativeManager?.bindNativeAd(activity, nativeAdView)
     }
 
+    /**
+     * Standard Anchored Adaptive Banner
+     */
     fun showBanner(
         activity: Activity,
         container: ViewGroup
@@ -236,6 +239,57 @@ object AdsManager {
             return
         }
         bannerManager?.showBannerAd(activity, container)
+    }
+
+    /**
+     * Collapsible Banner Ad (Expands initially and collapses).
+     * @param position "bottom" (default) or "top"
+     */
+    @JvmOverloads
+    fun showCollapsibleBanner(
+        activity: Activity,
+        container: ViewGroup,
+        position: String = "bottom"
+    ) {
+        if (isPremium()) {
+            container.removeAllViews()
+            container.visibility = View.GONE
+            return
+        }
+        bannerManager?.showCollapsibleBannerAd(activity, container, position)
+    }
+
+    /**
+     * Inline Adaptive Banner Ad (for RecyclerView or Scrollable lists).
+     * @param maxHeightDp Maximum allowed banner height in dp (default: 100)
+     */
+    @JvmOverloads
+    fun showInlineBanner(
+        activity: Activity,
+        container: ViewGroup,
+        maxHeightDp: Int = 100
+    ) {
+        if (isPremium()) {
+            container.removeAllViews()
+            container.visibility = View.GONE
+            return
+        }
+        bannerManager?.showInlineBannerAd(activity, container, maxHeightDp)
+    }
+
+    /**
+     * Medium Rectangle (MREC) Banner Ad (300x250).
+     */
+    fun showMediumRectangleBanner(
+        activity: Activity,
+        container: ViewGroup
+    ) {
+        if (isPremium()) {
+            container.removeAllViews()
+            container.visibility = View.GONE
+            return
+        }
+        bannerManager?.showMediumRectangleBannerAd(activity, container)
     }
 
     fun showRewarded(

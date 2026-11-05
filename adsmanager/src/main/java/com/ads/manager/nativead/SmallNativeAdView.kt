@@ -8,7 +8,12 @@ class SmallNativeAdView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : NativeAdContainerView(context, attrs, defStyleAttr) {
+    override var nativeType: Int = 1
+
     init {
-        nativeType = 1
+        if (isInEditMode) {
+            removeAllViews()
+            setupEditModePreview()
+        }
     }
 }

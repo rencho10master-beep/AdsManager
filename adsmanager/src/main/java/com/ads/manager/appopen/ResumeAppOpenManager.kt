@@ -79,6 +79,11 @@ class ResumeAppOpenManager(
         val activity = currentActivity ?: return
         if (activity.isFinishing || activity.isDestroyed) return
 
+        // Do not show resume ad on Splash screens
+        if (activity.javaClass.simpleName.contains("Splash", ignoreCase = true)) {
+            return
+        }
+
         val ad = resumeAd
         if (ad == null) {
             loadAd()
@@ -121,7 +126,14 @@ class ResumeAppOpenManager(
                 }
             }
 
-            ad.show(activity)
+            try {
+                ad.show(activity)
+            } catch (_: Exception) {
+                AdLoadingDialog.dismiss()
+                resumeAd = null
+                isShowingAd = false
+                loadAd()
+            }
         }, 600)
     }
 

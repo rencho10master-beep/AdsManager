@@ -8,7 +8,9 @@ object AdsInitializer {
     fun safeInitialize(context: Context, appId: String, onComplete: (() -> Unit)? = null) {
         if (!MobileAds.isInitialized) {
             try {
-                MobileAds.initialize(context, InitializationConfig.Builder(appId).build())
+                if (appId.isNotBlank()) {
+                    MobileAds.initialize(context, InitializationConfig.Builder(appId).build())
+                }
             } catch (_: Exception) {}
         }
         onComplete?.invoke()

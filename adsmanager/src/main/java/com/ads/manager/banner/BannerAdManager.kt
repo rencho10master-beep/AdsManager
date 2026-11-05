@@ -85,6 +85,11 @@ class BannerAdManager(private val config: AdsConfig) {
         onLoaded: (() -> Unit)?,
         onFailed: (() -> Unit)?
     ) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            onFailed?.invoke()
+            return
+        }
+
         if (config.bannerId.isBlank()) {
             container.visibility = View.GONE
             onFailed?.invoke()
@@ -99,8 +104,13 @@ class BannerAdManager(private val config: AdsConfig) {
             return
         }
 
-        val adView = AdView(activity)
+        // Clean up previous AdView before removing
+        for (i in 0 until container.childCount) {
+            (container.getChildAt(i) as? AdView)?.destroy()
+        }
         container.removeAllViews()
+
+        val adView = AdView(activity)
         container.addView(adView)
 
         val requestBuilder = BannerAdRequest.Builder(config.bannerId, adSize)
@@ -115,6 +125,7 @@ class BannerAdManager(private val config: AdsConfig) {
                 override fun onAdLoaded(ad: BannerAd) {
                     activity.runOnUiThread {
                         if (activity.isFinishing || activity.isDestroyed) {
+                            adView.destroy()
                             return@runOnUiThread
                         }
                         container.visibility = View.VISIBLE
@@ -124,6 +135,9 @@ class BannerAdManager(private val config: AdsConfig) {
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     activity.runOnUiThread {
+                        if (activity.isFinishing || activity.isDestroyed) {
+                            return@runOnUiThread
+                        }
                         container.visibility = View.GONE
                         onFailed?.invoke()
                     }

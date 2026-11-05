@@ -14,12 +14,12 @@ open class NativeAdContainerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    var nativeType: Int = 0 // 0 = large, 1 = small
+    open var nativeType: Int = 0 // 0 = large, 1 = small
 
     init {
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(it, R.styleable.NativeAdContainerView)
-            nativeType = typedArray.getInt(R.styleable.NativeAdContainerView_nativeType, 0)
+            nativeType = typedArray.getInt(R.styleable.NativeAdContainerView_nativeType, nativeType)
             typedArray.recycle()
         }
 
@@ -28,7 +28,7 @@ open class NativeAdContainerView @JvmOverloads constructor(
         }
     }
 
-    private fun setupEditModePreview() {
+    protected open fun setupEditModePreview() {
         val layoutRes = if (nativeType == 1) {
             R.layout.layout_small_native_ad
         } else {

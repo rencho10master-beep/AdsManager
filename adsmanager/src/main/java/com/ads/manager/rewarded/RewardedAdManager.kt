@@ -52,6 +52,11 @@ class RewardedAdManager(private val config: AdsConfig) {
         onUserEarnedReward: (AdReward) -> Unit,
         onClosed: () -> Unit
     ) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            onClosed()
+            return
+        }
+
         if (config.rewardedId.isBlank()) {
             onClosed()
             return
@@ -95,14 +100,21 @@ class RewardedAdManager(private val config: AdsConfig) {
             }
         }
 
-        ad.show(
-            activity,
-            object : OnUserEarnedRewardListener {
-                override fun onUserEarnedReward(reward: RewardItem) {
-                    earnedReward = AdReward(reward.amount, reward.type)
+        try {
+            ad.show(
+                activity,
+                object : OnUserEarnedRewardListener {
+                    override fun onUserEarnedReward(reward: RewardItem) {
+                        earnedReward = AdReward(reward.amount, reward.type)
+                    }
                 }
-            }
-        )
+            )
+        } catch (_: Exception) {
+            AdLoadingDialog.dismiss()
+            rewardedAd = null
+            loadAd(activity)
+            onClosed()
+        }
     }
 
     fun clearAd() {

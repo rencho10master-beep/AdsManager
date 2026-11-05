@@ -20,6 +20,8 @@ class InterstitialAdManager(
 ) {
     private var interstitialAd: InterstitialAd? = null
     private var isAdLoading = false
+    private var isShowingAd = false
+    private var lastClickTime: Long = 0
 
     fun loadAd(activity: Activity, onLoaded: (() -> Unit)? = null) {
         if (config.interstitialId.isBlank()) return
@@ -58,19 +60,37 @@ class InterstitialAdManager(
         count: Int = 1,
         onComplete: () -> Unit
     ) {
+        // Activity safety check
+        if (activity.isFinishing || activity.isDestroyed) {
+            onComplete()
+            return
+        }
+
+        // Prevent rapid duplicate clicks (debounce 600ms)
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime < 600) {
+            return
+        }
+        lastClickTime = currentTime
+
+        // Prevent overlapping ad shows
+        if (isShowingAd) {
+            return
+        }
+
         // If interstitialId is empty, safely proceed immediately without crash
         if (config.interstitialId.isBlank()) {
             onComplete()
             return
         }
 
-        // ૧. જો ક્લિક કાઉન્ટ પ્રમાણે Ad બતાવવાની ન હોય
+        // 1. If not matched click count, proceed without ad
         if (!clickTracker.shouldShowAd(count)) {
             onComplete()
             return
         }
 
-        // ૨. જો Ad હજુ લોડ નથી થઈ (Fail થઈ હોય) તો નેક્સ્ટ ટાઇમ માટે લોડ કરી તરત onComplete() કોલ કરો
+        // 2. If ad is not loaded, reload for next time and proceed
         val ad = interstitialAd
         if (ad == null) {
             loadAd(activity)
@@ -78,31 +98,35 @@ class InterstitialAdManager(
             return
         }
 
-        // ૩. Loading Dialog બતાવો
+        // 3. Show Loading Dialog
+        isShowingAd = true
         AdLoadingDialog.show(activity, config)
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (activity.isFinishing || activity.isDestroyed) {
                 AdLoadingDialog.dismiss()
+                isShowingAd = false
                 onComplete()
                 return@postDelayed
             }
 
             ad.adEventCallback = object : InterstitialAdEventCallback {
-                // ૪. યુઝર Ad ક્લોઝ કરે ત્યારે:
+                // 4. Ad Dismissed
                 override fun onAdDismissedFullScreenContent() {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
+                        isShowingAd = false
                         interstitialAd = null
                         loadAd(activity)
                         onComplete()
                     }
                 }
 
-                // ૫. જો Ad બતાવવામાં ફેલ થાય ત્યારે:
+                // 5. Ad Failed To Show
                 override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
+                        isShowingAd = false
                         interstitialAd = null
                         loadAd(activity)
                         onComplete()
@@ -116,12 +140,21 @@ class InterstitialAdManager(
                 }
             }
 
-            ad.show(activity)
+            try {
+                ad.show(activity)
+            } catch (_: Exception) {
+                AdLoadingDialog.dismiss()
+                isShowingAd = false
+                interstitialAd = null
+                loadAd(activity)
+                onComplete()
+            }
         }, 600)
     }
 
     fun clearAd() {
         interstitialAd = null
         isAdLoading = false
+        isShowingAd = false
     }
 }

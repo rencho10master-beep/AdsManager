@@ -54,7 +54,7 @@ class SplashAppOpenManager(private val config: AdsConfig) {
     }
 
     fun showSplashAd(activity: Activity, onComplete: () -> Unit) {
-        if (AdsManager.isPremium() || config.splashAppOpenId.isBlank()) {
+        if (activity.isFinishing || activity.isDestroyed || AdsManager.isPremium() || config.splashAppOpenId.isBlank()) {
             onComplete()
             return
         }
@@ -85,7 +85,12 @@ class SplashAppOpenManager(private val config: AdsConfig) {
             }
         }
 
-        ad.show(activity)
+        try {
+            ad.show(activity)
+        } catch (_: Exception) {
+            splashAd = null
+            onComplete()
+        }
     }
 
     fun loadAndShowSplashAd(

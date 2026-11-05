@@ -31,6 +31,11 @@ class NativeAdManager(private val config: AdsConfig) {
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            onFailed?.invoke()
+            return
+        }
+
         AdsInitializer.safeInitialize(activity, config.appId)
 
         if (config.nativeId.isBlank() || !MobileAds.isInitialized) {
@@ -130,6 +135,11 @@ class NativeAdManager(private val config: AdsConfig) {
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
+        if (activity.isFinishing || activity.isDestroyed) {
+            onFailed?.invoke()
+            return
+        }
+
         AdsInitializer.safeInitialize(activity, config.appId)
 
         if (config.nativeId.isBlank() || !MobileAds.isInitialized) {
@@ -184,6 +194,7 @@ class NativeAdManager(private val config: AdsConfig) {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        (view.parent as? ViewGroup)?.removeView(view)
         wrapper.addView(view)
         return wrapper
     }

@@ -1,48 +1,74 @@
 # AdsManager Android Library
 
-A clean, standalone, zero-bloat Android Ads Library powered by **Google Mobile Ads (Next-Gen SDK v1.6.0)** with **compileSdk = 37**.
+[![](https://jitpack.io/v/rencho10master-beep/AdsManager.svg)](https://jitpack.io/#rencho10master-beep/AdsManager)
+[![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
+[![CompileSdk](https://img.shields.io/badge/compileSdk-37-blue.svg)](https://developer.android.com)
 
-### Features:
-- **Zero Warnings & Zero Deprecation**: Completely clean compile output on Android API 37.
-- **Two Distinct App Open Ads**:
-  1. **Splash App Open Ad**: With `onComplete` callback and configurable timeout (prevents stuck splash screens).
-  2. **Resume App Open Ad**: Displays full-screen loading dialog when returning from background / recent apps, then shows the App Open Ad.
-- **Strict `isPremium` Mode**:
-  - `AdsManager.isPremium = true` or `AdsManager.updatePremiumStatus(true)` or `AdsManager.setAdsEnabled(false)`.
-  - Instantly kills all ad requests and dismisses any loading dialogs.
-  - **No Shimmer**: Native / Banner containers are immediately made `GONE` and views removed so user never sees empty gray boxes or loading animations.
-  - Interstitial & Splash callbacks fire immediately without delay.
-- **Flexible Interstitial Ad Frequency**:
-  - `AdsManager.showInterstitial(this, 1) { ... }` -> Show every single click.
-  - `AdsManager.showInterstitial(this, 2) { ... }` -> Show on 1st click, then every 2nd click.
-  - `AdsManager.showInterstitial(this, 3) { ... }` -> Show on 1st click, then every 3rd click.
-  - When ad fails, closes, or skips, `{ ... }` callback fires immediately!
-- **Custom XML Layouts for Native Ads**:
-  - Works with any `ViewGroup` (`FrameLayout`, `LinearLayout`, `CardView`, etc.).
-  - Supports custom designed XML layouts (`customAdLayoutResId = R.layout.my_layout`).
-  - Supports direct binding to `NativeAdView` in XML (`bindNative(activity, view)`).
-  - Built-in Medium and Small Native ad layouts with Android Studio preview (`tools:` attributes).
-- **Custom Canvas Shimmer**: Zero external libraries (no Facebook Shimmer).
-- **Notch / Cutout Friendly Loading Dialog**: Translucent fullscreen overlay before interstitial / app open ads.
+A clean, standalone, zero-bloat Android Ads Library powered by **Google Mobile Ads (Next-Gen SDK v1.6.0)** with **compileSdk = 37**.
 
 ---
 
-## 🚀 Usage Guide
+## 📦 1. Installation (Add Dependency)
 
-### 1. Initialize in Application Class
+### Step 1: Add JitPack repository
+In your root `settings.gradle` (or `settings.gradle.kts`):
+
+```groovy
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' } // <-- Add this line
+    }
+}
+```
+
+### Step 2: Add the dependency
+In your app's `build.gradle` (or `build.gradle.kts`):
+
+```groovy
+dependencies {
+    implementation 'com.github.rencho10master-beep:AdsManager:1.0.0'
+}
+```
+
+---
+
+## ⚙️ 2. AndroidManifest.xml Setup
+
+Add your AdMob App ID inside the `<application>` tag:
+
+```xml
+<manifest>
+    <application>
+        <!-- AdMob App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy" />
+    </application>
+</manifest>
+```
+
+---
+
+## 🚀 3. Initialize in Application Class
+
+In your `Application` class:
+
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
         val config = AdsConfig(
-            appId = "ca-app-pub-xxxxxxxx~yyyyyyyy",
-            bannerId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            interstitialId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            nativeId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            rewardedId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            splashAppOpenId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            resumeAppOpenId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
+            appId = "ca-app-pub-3940256099942544~3347511713",
+            bannerId = "ca-app-pub-3940256099942544/6300978111",
+            interstitialId = "ca-app-pub-3940256099942544/1033173712",
+            nativeId = "ca-app-pub-3940256099942544/2247696110",
+            rewardedId = "ca-app-pub-3940256099942544/5224354917",
+            splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
+            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
             interstitialInterval = 1
         )
 
@@ -54,16 +80,40 @@ class MyApplication : Application() {
 
 ---
 
-### 2. Splash Screen Implementation (with Callback & Timeout)
+## 🛡️ 4. Private DNS Detection (`isDNS`)
+
+Detect if the user has Private DNS (AdBlock DNS, AdGuard, NextDNS) turned ON on their device:
+
+```kotlin
+// Check anywhere using Context:
+if (AdsManager.isDNS(this)) {
+    // Private DNS is ON (Blocking Ads)
+    // Show dialog to ask user to turn off Private DNS or buy Premium!
+} else {
+    // Private DNS is OFF (Normal flow)
+}
+
+// Or using property (after AdsManager.init):
+if (AdsManager.isDNS) {
+    // DNS is ON
+}
+```
+
+---
+
+## ⏱️ 5. Splash Screen App Open Ad
+
+Loads and shows App Open Ad with timeout safety. If ad fails or takes too long, the `{ ... }` callback fires automatically so splash screen never freezes:
+
 ```kotlin
 class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        // Automatically preloads & shows splash ad with 5s timeout safety
+        // 5-second timeout safety
         AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 5000L) {
-            // Callback fires after ad closes, fails, or if isPremium == true
+            // Callback fires after ad closes, fails, or if user is Premium:
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
@@ -73,20 +123,23 @@ class SplashActivity : AppCompatActivity() {
 
 ---
 
-### 3. Interstitial Ads (Simple Count & Instant Callback)
+## 🎯 6. Interstitial Ads (with Click Count)
+
+Shows Interstitial Ad with frequency count. The callback `{ ... }` **always executes** when ad closes, fails to load, or if user is premium:
+
 ```kotlin
-// Har vakhte show karva mate (Count 1):
+// Har vakhte show karva mate (Count = 1):
 AdsManager.showInterstitial(this, 1) {
-    // Ad close thay ya fail thay atyare aa run thase:
+    // Navigate or perform action
     startActivity(Intent(this, DetailActivity::class.java))
 }
 
-// Dar 2ji var show karva mate (Count 2):
+// Dar 2ji var show karva mate (Count = 2):
 AdsManager.showInterstitial(this, 2) {
     startActivity(Intent(this, DetailActivity::class.java))
 }
 
-// Dar 3ji var show karva mate (Count 3):
+// Dar 3ji var show karva mate (Count = 3):
 AdsManager.showInterstitial(this, 3) {
     startActivity(Intent(this, DetailActivity::class.java))
 }
@@ -94,34 +147,71 @@ AdsManager.showInterstitial(this, 3) {
 
 ---
 
-### 4. Native & Banner Ads (Simple - No Callbacks Needed)
+## 🖼️ 7. Native Ads (Medium, Small & Custom XML Layouts)
+
+### A. Medium Native Ad (with MediaView & Shimmer)
 ```kotlin
-// 1. Medium Native Ad (with MediaView & Shimmer)
 AdsManager.showNative(this, binding.nativeAdContainer)
+```
 
-// 2. Small Native Ad (Compact - no MediaView, great for bottom/lists)
+### B. Small Native Ad (Compact - no MediaView, great for lists / bottom)
+```kotlin
 AdsManager.showNativeSmall(this, binding.smallNativeContainer)
+```
 
-// 3. Your Own Custom XML Layout!
+### C. Your Own Custom Designed XML Layout!
+Create your own XML layout (e.g. `res/layout/my_custom_native_ad.xml`) with any CardView, background, or colors, and pass it:
+```kotlin
 AdsManager.showNative(
     activity = this,
-    container = binding.customAdContainer, // Any ViewGroup (CardView, LinearLayout, etc.)
+    container = binding.myContainer, // Any ViewGroup (CardView, LinearLayout, FrameLayout, etc.)
     customAdLayoutResId = R.layout.my_custom_native_ad
 )
+```
 
-// 4. Banner Ad (Adaptive size)
+---
+
+## 📱 8. Adaptive Banner Ads
+
+```kotlin
 AdsManager.showBanner(this, binding.bannerContainer)
 ```
 
 ---
 
-### 5. Premium / VIP Mode Functions
-When user buys premium inside PremiumActivity:
+## 🎁 9. Rewarded Ads
+
 ```kotlin
+AdsManager.showRewarded(
+    activity = this,
+    onEarned = { reward ->
+        Toast.makeText(this, "Reward: ${reward.amount} ${reward.type}", Toast.LENGTH_SHORT).show()
+    },
+    onClosed = {
+        // User closed ad
+    }
+)
+```
+
+---
+
+## 👑 10. Premium / VIP User Mode (Disable All Ads)
+
+When user purchases subscription in PremiumActivity:
+
+```kotlin
+// Option 1: Property
 AdsManager.isPremium = true
-// or
+
+// Option 2: Function
 AdsManager.updatePremiumStatus(true)
-// or
+
+// Option 3: Disable Ads function
 AdsManager.setAdsEnabled(false)
 ```
-All ads, loading dialogs, and shimmers are instantly dismissed and hidden!
+
+### What happens when Premium is enabled:
+- Instantly dismisses any open loading dialogs.
+- Kills all pending ad requests.
+- Native & Banner containers immediately become `GONE` (no blank spaces or shimmer).
+- Interstitial & Splash callbacks fire immediately without any delay.

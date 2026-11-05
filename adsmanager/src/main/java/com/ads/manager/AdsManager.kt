@@ -69,11 +69,37 @@ object AdsManager {
         return !isPremium
     }
 
+    private var applicationContext: android.content.Context? = null
+
+    /**
+     * Variable to check if Private DNS is enabled (ON).
+     * If Private DNS is ON -> returns true
+     * If Private DNS is OFF -> returns false
+     */
+    @JvmStatic
+    val isDNS: Boolean
+        get() = applicationContext?.let { com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(it) } ?: false
+
+    /**
+     * Check if Private DNS is enabled by passing Context:
+     * e.g. AdsManager.isDNS(this) or AdsManager.checkDNS(this)
+     */
+    @JvmStatic
+    fun isDNS(context: android.content.Context): Boolean {
+        return com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(context)
+    }
+
+    @JvmStatic
+    fun checkDNS(context: android.content.Context): Boolean {
+        return com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(context)
+    }
+
     fun init(
         application: Application,
         customConfig: AdsConfig = AdsConfig(),
         enableResumeAppOpenAd: Boolean = true
     ) {
+        applicationContext = application.applicationContext
         config = customConfig
         clickTracker = AdClickTracker(customConfig.interstitialInterval)
 

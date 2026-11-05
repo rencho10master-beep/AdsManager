@@ -6,6 +6,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -17,15 +19,26 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.ads.manager.AdsConfig
+import java.lang.ref.WeakReference
 
 object AdLoadingDialog {
     private var dialog: Dialog? = null
+    private var activityRef: WeakReference<Activity>? = null
 
     fun show(activity: Activity, config: AdsConfig) {
+        // 1. Thread check: Always run on Main (UI) thread
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Handler(Looper.getMainLooper()).post { show(activity, config) }
+            return
+        }
+
+        // 2. Activity lifecycle safety: isFinishing or isDestroyed check
         if (activity.isFinishing || activity.isDestroyed) return
+
         dismiss()
 
         try {
+            activityRef = WeakReference(activity)
             dialog = Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar).apply {
                 setCancelable(false)
 
@@ -91,8 +104,12 @@ object AdLoadingDialog {
                 }
             }
 
-            if (!activity.isFinishing && !activity.isDestroyed) {
+            // 3. Double-check right before show()
+            val act = activityRef?.get()
+            if (act != null && !act.isFinishing && !act.isDestroyed) {
                 dialog?.show()
+            } else {
+                dialog = null
             }
         } catch (_: Exception) {
             dialog = null
@@ -100,15 +117,31 @@ object AdLoadingDialog {
     }
 
     fun dismiss() {
+        // Always run dismiss on Main UI thread
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            Handler(Looper.getMainLooper()).post { dismiss() }
+            return
+        }
+
         try {
+            val act = activityRef?.get()
+            // If activity is already finishing or destroyed, skip dismiss call to avoid WindowManager BadTokenException
+            if (act != null && (act.isFinishing || act.isDestroyed)) {
+                dialog = null
+                activityRef = null
+                return
+            }
+
             dialog?.let {
                 if (it.isShowing) {
                     it.dismiss()
                 }
             }
         } catch (_: Exception) {
+            // Silently catch any WindowLeaked or BadTokenException
         } finally {
             dialog = null
+            activityRef = null
         }
     }
 }

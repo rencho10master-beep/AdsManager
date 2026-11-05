@@ -61,7 +61,44 @@ dependencies {
 </manifest>
 ```
 
-### 4. Initialize in `Application` Class
+---
+
+### 4. 🇪🇺 Google UMP GDPR Consent (European Union & UK)
+Call this in your `SplashActivity` before requesting ads. It automatically presents Google's official consent form for users in EEA & UK, and skips automatically for users in other countries (India, US, etc.):
+
+```kotlin
+// In SplashActivity.onCreate()
+AdsManager.requestConsent(this) { canRequestAds ->
+    // Consent finished or skipped -> safely load & show splash ad!
+    AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+}
+```
+
+If you have a "Privacy Settings" button inside your app's Settings screen:
+```kotlin
+AdsManager.showPrivacyOptions(this) {
+    // User updated their consent preferences
+}
+```
+
+---
+
+### 5. 🛡️ Private DNS (AdBlock) Detection
+Detect if the user is using an AdBlock Private DNS (like AdGuard, NextDNS) that blocks all ads:
+
+```kotlin
+// Returns true if AdBlock Private DNS is active, false otherwise
+if (AdsManager.isDNS(this)) {
+    // Show alert / dialog to ask user to turn off Private DNS
+}
+```
+
+---
+
+### 6. Initialize in `Application` Class
 Configure only the Ad IDs you need in your `Application` class. Omitted IDs safely default to blank without crashes:
 
 ```kotlin
@@ -107,7 +144,7 @@ class MyApplication : Application() {
 
 ---
 
-### 5. XML Custom Views (With Live Mockup in Android Studio Preview!)
+### 7. XML Custom Views (With Live Mockup in Android Studio Preview!)
 
 #### A. Large Native Ad View (Full MediaView + Icon + Headline + Body + Install button)
 In your XML layout:
@@ -159,7 +196,7 @@ binding.bannerAdView.load(this)
 
 ---
 
-### 6. Android Ad Actions in Kotlin
+### 8. Android Ad Actions in Kotlin
 
 #### 🎬 Show Interstitial Ad (Always calls callback on close, skip, or fail)
 ```kotlin
@@ -208,35 +245,6 @@ AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
 }
 ```
 
-#### 🇪🇺 Google UMP GDPR Consent (European Union & UK)
-Call this in your `SplashActivity` before loading ads. It automatically presents Google's official consent form for users in EEA & UK, and skips automatically for users in other countries (India, US, etc.):
-
-```kotlin
-// In SplashActivity.onCreate()
-AdsManager.requestConsent(this) { canRequestAds ->
-    // Consent finished or skipped -> safely load & show splash ad!
-    AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
-}
-```
-
-If you have a "Privacy Settings" option inside your app's Settings screen:
-```kotlin
-AdsManager.showPrivacyOptions(this) {
-    // User updated their consent preferences
-}
-```
-
-#### 🛡️ Private DNS (AdBlock) Detection
-```kotlin
-// Returns true if AdBlock Private DNS (AdGuard, NextDNS) is active, false otherwise
-if (AdsManager.isDNS(this)) {
-    // Show dialog or alert user to turn off Private DNS
-}
-```
-
 #### 💎 Instant Premium Mode (Turns OFF all ads & shimmers)
 ```kotlin
 // Enable Premium
@@ -279,7 +287,31 @@ dependencies:
 </manifest>
 ```
 
-### 3. Initialize in `main.dart`
+---
+
+### 3. 🇪🇺 Google UMP GDPR Consent in Flutter
+```dart
+// Check & show Google Consent dialog on app launch:
+bool canRequestAds = await AdsManager.requestConsent();
+
+// If you have a Privacy Settings button in settings screen:
+await AdsManager.showPrivacyOptions();
+```
+
+---
+
+### 4. 🛡️ Private DNS (AdBlocker) Check in Flutter
+```dart
+// Returns true if AdBlock DNS is active, false otherwise
+bool isDnsOn = await AdsManager.isDNS();
+if (isDnsOn) {
+  // Alert user to turn off AdBlock DNS
+}
+```
+
+---
+
+### 5. Initialize in `main.dart`
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ads_manager/ads_manager.dart';
@@ -325,7 +357,7 @@ void main() async {
 
 ---
 
-### 4. Flutter Widgets (Pure Dart Widgets - ZERO XML!)
+### 6. Flutter Widgets (Pure Dart Widgets - ZERO XML!)
 
 #### 🖼️ Native Ad Widget (With Custom Shimmer & Auto Ad Binding)
 ```dart
@@ -359,7 +391,7 @@ const BannerAdWidget(type: BannerType.mrec)
 
 ---
 
-### 5. Flutter Ad Actions in Dart
+### 7. Flutter Ad Actions in Dart
 
 #### 🎬 Show Interstitial Ad (Always calls callback on close, skip, or fail)
 ```dart
@@ -393,24 +425,6 @@ AdsManager.loadAndShowSplashAppOpenAd(
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   },
 );
-```
-
-#### 🇪🇺 Google UMP GDPR Consent in Flutter
-```dart
-// Check & show Google Consent dialog on app launch:
-bool canRequestAds = await AdsManager.requestConsent();
-
-// If you have a Privacy Settings button in settings screen:
-await AdsManager.showPrivacyOptions();
-```
-
-#### 🛡️ Private DNS (AdBlocker) Check in Flutter
-```dart
-// Returns true if AdBlock DNS is active, false otherwise
-bool isDnsOn = await AdsManager.isDNS();
-if (isDnsOn) {
-  // Alert user
-}
 ```
 
 #### 💎 Set Premium Mode in Flutter

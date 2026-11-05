@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.ads.manager.AdsConfig
 import com.ads.manager.R
+import com.ads.manager.callback.NativeAdCallback
 import com.ads.manager.init.AdsInitializer
 import com.ads.manager.shimmer.CustomShimmerFrameLayout
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
@@ -16,6 +17,7 @@ import com.google.android.libraries.ads.mobile.sdk.common.AdChoicesPlacement
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import com.google.android.libraries.ads.mobile.sdk.nativead.MediaView
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAd
+import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoader
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdLoaderCallback
 import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdRequest
@@ -28,6 +30,7 @@ class NativeAdManager(private val config: AdsConfig) {
         container: ViewGroup,
         customAdLayoutResId: Int? = null,
         customShimmerResId: Int? = null,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
@@ -35,6 +38,7 @@ class NativeAdManager(private val config: AdsConfig) {
 
         if (!MobileAds.isInitialized) {
             container.visibility = View.GONE
+            callback?.onNativeAdFailed()
             onFailed?.invoke()
             return
         }
@@ -75,6 +79,14 @@ class NativeAdManager(private val config: AdsConfig) {
                             return@runOnUiThread
                         }
 
+                        nativeAd.adEventCallback = object : NativeAdEventCallback {
+                            override fun onAdClicked() {
+                                activity.runOnUiThread {
+                                    callback?.onNativeAdClicked()
+                                }
+                            }
+                        }
+
                         shimmerContainer?.stopShimmer()
                         container.removeAllViews()
 
@@ -93,6 +105,7 @@ class NativeAdManager(private val config: AdsConfig) {
                             nativeAdView
                         }
                         container.addView(viewToAdd)
+                        callback?.onNativeAdLoaded()
                         onLoaded?.invoke()
                     }
                 }
@@ -101,6 +114,7 @@ class NativeAdManager(private val config: AdsConfig) {
                     activity.runOnUiThread {
                         shimmerContainer?.stopShimmer()
                         container.visibility = View.GONE
+                        callback?.onNativeAdFailed()
                         onFailed?.invoke()
                     }
                 }
@@ -111,6 +125,7 @@ class NativeAdManager(private val config: AdsConfig) {
     fun showNativeSmall(
         activity: Activity,
         container: ViewGroup,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
@@ -119,6 +134,7 @@ class NativeAdManager(private val config: AdsConfig) {
             container = container,
             customAdLayoutResId = R.layout.layout_small_native_ad,
             customShimmerResId = R.layout.layout_shimmer_small_native,
+            callback = callback,
             onLoaded = onLoaded,
             onFailed = onFailed
         )
@@ -127,6 +143,7 @@ class NativeAdManager(private val config: AdsConfig) {
     fun bindNativeAd(
         activity: Activity,
         nativeAdView: NativeAdView,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
@@ -134,6 +151,7 @@ class NativeAdManager(private val config: AdsConfig) {
 
         if (!MobileAds.isInitialized) {
             nativeAdView.visibility = View.GONE
+            callback?.onNativeAdFailed()
             onFailed?.invoke()
             return
         }
@@ -153,8 +171,16 @@ class NativeAdManager(private val config: AdsConfig) {
                             nativeAd.destroy()
                             return@runOnUiThread
                         }
+                        nativeAd.adEventCallback = object : NativeAdEventCallback {
+                            override fun onAdClicked() {
+                                activity.runOnUiThread {
+                                    callback?.onNativeAdClicked()
+                                }
+                            }
+                        }
                         bindNativeAdView(nativeAd, nativeAdView)
                         nativeAdView.visibility = View.VISIBLE
+                        callback?.onNativeAdLoaded()
                         onLoaded?.invoke()
                     }
                 }
@@ -162,6 +188,7 @@ class NativeAdManager(private val config: AdsConfig) {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     activity.runOnUiThread {
                         nativeAdView.visibility = View.GONE
+                        callback?.onNativeAdFailed()
                         onFailed?.invoke()
                     }
                 }

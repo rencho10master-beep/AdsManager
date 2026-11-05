@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import com.ads.manager.appopen.ResumeAppOpenManager
 import com.ads.manager.appopen.SplashAppOpenManager
 import com.ads.manager.banner.BannerAdManager
+import com.ads.manager.callback.BannerAdCallback
+import com.ads.manager.callback.InterstitialAdCallback
+import com.ads.manager.callback.NativeAdCallback
 import com.ads.manager.dialog.AdLoadingDialog
 import com.ads.manager.init.AdsInitializer
 import com.ads.manager.interstitial.AdClickTracker
@@ -18,7 +21,7 @@ import com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView
 
 object AdsManager {
     private var config: AdsConfig = AdsConfig()
-    private var clickTracker: AdClickTracker = AdClickTracker(2)
+    private var clickTracker: AdClickTracker = AdClickTracker(1)
 
     private var interstitialManager: InterstitialAdManager? = null
     private var nativeManager: NativeAdManager? = null
@@ -127,32 +130,24 @@ object AdsManager {
     }
 
     /**
-     * Show Interstitial Ad with customizable interval and optional unique key.
-     * @param interval 1 = show every single time!
-     *                 2 = show on 1st click, then every 2nd click.
-     *                 3 = show on 1st click, then every 3rd click.
-     * @param key Optional unique identifier for different screens/buttons so their counts don't conflict.
+     * Show Interstitial Ad with count.
+     * count = 1: Har vakhte show thase (Every single click)
+     * count = 2: Dar 2ji var show thase
+     * count = 3: Dar 3ji var show thase
      */
     @JvmOverloads
     fun showInterstitial(
         activity: Activity,
-        interval: Int = config.interstitialInterval,
-        key: String? = null,
+        count: Int = config.interstitialInterval,
+        callback: InterstitialAdCallback? = null,
         onComplete: () -> Unit
     ) {
         if (isPremium) {
+            callback?.onInterstitialAdDismissed()
             onComplete()
             return
         }
-        interstitialManager?.showAd(activity, interval, key, onComplete) ?: onComplete()
-    }
-
-    /**
-     * Helper to reset click counters for interstitial ads.
-     */
-    @JvmStatic
-    fun resetInterstitialClicks(key: String? = null) {
-        clickTracker.reset(key)
+        interstitialManager?.showAd(activity, count, callback, onComplete) ?: onComplete()
     }
 
     /**
@@ -164,12 +159,14 @@ object AdsManager {
         container: ViewGroup,
         customAdLayoutResId: Int? = null,
         customShimmerResId: Int? = null,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
         if (isPremium) {
             container.removeAllViews()
             container.visibility = View.GONE
+            callback?.onNativeAdFailed()
             onFailed?.invoke()
             return
         }
@@ -178,6 +175,7 @@ object AdsManager {
             container = container,
             customAdLayoutResId = customAdLayoutResId,
             customShimmerResId = customShimmerResId,
+            callback = callback,
             onLoaded = onLoaded,
             onFailed = onFailed
         )
@@ -189,16 +187,18 @@ object AdsManager {
     fun showNativeSmall(
         activity: Activity,
         container: ViewGroup,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
         if (isPremium) {
             container.removeAllViews()
             container.visibility = View.GONE
+            callback?.onNativeAdFailed()
             onFailed?.invoke()
             return
         }
-        nativeManager?.showNativeSmall(activity, container, onLoaded, onFailed)
+        nativeManager?.showNativeSmall(activity, container, callback, onLoaded, onFailed)
     }
 
     /**
@@ -207,30 +207,34 @@ object AdsManager {
     fun bindNative(
         activity: Activity,
         nativeAdView: NativeAdView,
+        callback: NativeAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
         if (isPremium) {
             nativeAdView.visibility = View.GONE
+            callback?.onNativeAdFailed()
             onFailed?.invoke()
             return
         }
-        nativeManager?.bindNativeAd(activity, nativeAdView, onLoaded, onFailed)
+        nativeManager?.bindNativeAd(activity, nativeAdView, callback, onLoaded, onFailed)
     }
 
     fun showBanner(
         activity: Activity,
         container: ViewGroup,
+        callback: BannerAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
         if (isPremium) {
             container.removeAllViews()
             container.visibility = View.GONE
+            callback?.onBannerAdFailed()
             onFailed?.invoke()
             return
         }
-        bannerManager?.showBannerAd(activity, container, onLoaded, onFailed)
+        bannerManager?.showBannerAd(activity, container, callback, onLoaded, onFailed)
     }
 
     fun showRewarded(

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import com.ads.manager.AdsConfig
+import com.ads.manager.callback.InterstitialAdCallback
 import com.ads.manager.dialog.AdLoadingDialog
 import com.ads.manager.init.AdsInitializer
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
@@ -53,12 +54,12 @@ class InterstitialAdManager(
 
     fun showAd(
         activity: Activity,
-        interval: Int = config.interstitialInterval,
-        key: String? = null,
+        count: Int = config.interstitialInterval,
+        callback: InterstitialAdCallback? = null,
         onComplete: () -> Unit
     ) {
-        val trackingKey = key ?: "interval_$interval"
-        if (!clickTracker.shouldShowAd(interval, trackingKey)) {
+        if (!clickTracker.shouldShowAd(count)) {
+            callback?.onInterstitialAdDismissed()
             onComplete()
             return
         }
@@ -66,6 +67,7 @@ class InterstitialAdManager(
         val ad = interstitialAd
         if (ad == null) {
             loadAd(activity)
+            callback?.onInterstitialAdFailed()
             onComplete()
             return
         }
@@ -75,6 +77,7 @@ class InterstitialAdManager(
         Handler(Looper.getMainLooper()).postDelayed({
             if (activity.isFinishing || activity.isDestroyed) {
                 AdLoadingDialog.dismiss()
+                callback?.onInterstitialAdFailed()
                 onComplete()
                 return@postDelayed
             }
@@ -85,6 +88,7 @@ class InterstitialAdManager(
                         AdLoadingDialog.dismiss()
                         interstitialAd = null
                         loadAd(activity)
+                        callback?.onInterstitialAdDismissed()
                         onComplete()
                     }
                 }
@@ -94,6 +98,7 @@ class InterstitialAdManager(
                         AdLoadingDialog.dismiss()
                         interstitialAd = null
                         loadAd(activity)
+                        callback?.onInterstitialAdFailed()
                         onComplete()
                     }
                 }
@@ -101,6 +106,13 @@ class InterstitialAdManager(
                 override fun onAdShowedFullScreenContent() {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
+                        callback?.onInterstitialAdShown()
+                    }
+                }
+
+                override fun onAdClicked() {
+                    activity.runOnUiThread {
+                        callback?.onInterstitialAdClicked()
                     }
                 }
             }

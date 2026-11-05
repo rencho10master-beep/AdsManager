@@ -6,11 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowMetrics
 import com.ads.manager.AdsConfig
+import com.ads.manager.callback.BannerAdCallback
 import com.ads.manager.init.AdsInitializer
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
 import com.google.android.libraries.ads.mobile.sdk.banner.AdSize
 import com.google.android.libraries.ads.mobile.sdk.banner.AdView
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAd
+import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdEventCallback
 import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
@@ -20,6 +22,7 @@ class BannerAdManager(private val config: AdsConfig) {
     fun showBannerAd(
         activity: Activity,
         container: ViewGroup,
+        callback: BannerAdCallback? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
@@ -27,6 +30,7 @@ class BannerAdManager(private val config: AdsConfig) {
 
         if (!MobileAds.isInitialized) {
             container.visibility = View.GONE
+            callback?.onBannerAdFailed()
             onFailed?.invoke()
             return
         }
@@ -46,7 +50,15 @@ class BannerAdManager(private val config: AdsConfig) {
                         if (activity.isFinishing || activity.isDestroyed) {
                             return@runOnUiThread
                         }
+                        ad.adEventCallback = object : BannerAdEventCallback {
+                            override fun onAdClicked() {
+                                activity.runOnUiThread {
+                                    callback?.onBannerAdClicked()
+                                }
+                            }
+                        }
                         container.visibility = View.VISIBLE
+                        callback?.onBannerAdLoaded()
                         onLoaded?.invoke()
                     }
                 }
@@ -54,6 +66,7 @@ class BannerAdManager(private val config: AdsConfig) {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     activity.runOnUiThread {
                         container.visibility = View.GONE
+                        callback?.onBannerAdFailed()
                         onFailed?.invoke()
                     }
                 }

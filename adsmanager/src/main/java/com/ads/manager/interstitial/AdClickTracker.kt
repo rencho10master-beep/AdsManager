@@ -1,36 +1,27 @@
 package com.ads.manager.interstitial
 
-class AdClickTracker(private val defaultInterval: Int = 2) {
-    private val clickCounters = mutableMapOf<String, Int>()
+class AdClickTracker(private val defaultInterval: Int = 1) {
+    private val countMap = mutableMapOf<Int, Int>()
 
     @Synchronized
-    fun shouldShowAd(interval: Int = defaultInterval, key: String = "interval_$interval"): Boolean {
-        if (interval <= 1) {
-            // Har vakhte show (every time on every single click)
+    fun shouldShowAd(count: Int = defaultInterval): Boolean {
+        if (count <= 1) {
+            // Har vakhte show (Every single click)
             return true
         }
 
-        val currentCount = (clickCounters[key] ?: 0) + 1
-        clickCounters[key] = currentCount
+        val current = (countMap[count] ?: 0) + 1
+        countMap[count] = current
 
-        return if (currentCount == 1) {
-            true // First click par show thase
+        return if (current == 1) {
+            true // First time show
         } else {
-            (currentCount - 1) % interval == 0
+            (current - 1) % count == 0
         }
     }
 
     @Synchronized
-    fun reset(key: String? = null) {
-        if (key != null) {
-            clickCounters.remove(key)
-        } else {
-            clickCounters.clear()
-        }
-    }
-
-    @Synchronized
-    fun getClickCount(key: String = "default"): Int {
-        return clickCounters[key] ?: 0
+    fun reset() {
+        countMap.clear()
     }
 }

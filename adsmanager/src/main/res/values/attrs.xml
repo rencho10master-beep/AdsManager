@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ShimmerAdView">
+        <attr name="shimmerBaseColor" format="color" />
+        <attr name="shimmerHighlightColor" format="color" />
+        <attr name="shimmerDuration" format="integer" />
+    </declare-styleable>
+</resources>

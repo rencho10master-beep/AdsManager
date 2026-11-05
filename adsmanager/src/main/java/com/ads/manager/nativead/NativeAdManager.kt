@@ -33,7 +33,7 @@ class NativeAdManager(private val config: AdsConfig) {
     ) {
         AdsInitializer.safeInitialize(activity, config.appId)
 
-        if (!MobileAds.isInitialized) {
+        if (config.nativeId.isBlank() || !MobileAds.isInitialized) {
             container.visibility = View.GONE
             onFailed?.invoke()
             return
@@ -132,7 +132,7 @@ class NativeAdManager(private val config: AdsConfig) {
     ) {
         AdsInitializer.safeInitialize(activity, config.appId)
 
-        if (!MobileAds.isInitialized) {
+        if (config.nativeId.isBlank() || !MobileAds.isInitialized) {
             nativeAdView.visibility = View.GONE
             onFailed?.invoke()
             return

@@ -102,7 +102,7 @@ object AdsManager {
     ) {
         applicationContext = application.applicationContext
         config = customConfig
-        clickTracker = AdClickTracker(customConfig.interstitialInterval)
+        clickTracker = AdClickTracker(1)
 
         interstitialManager = InterstitialAdManager(config, clickTracker)
         nativeManager = NativeAdManager(config)
@@ -110,7 +110,7 @@ object AdsManager {
         rewardedManager = RewardedAdManager(config)
         splashAppOpenManager = SplashAppOpenManager(config)
 
-        if (enableResumeAppOpenAd) {
+        if (enableResumeAppOpenAd && config.resumeAppOpenId.isNotBlank()) {
             resumeAppOpenManager = ResumeAppOpenManager(application, config)
             resumeAppOpenManager?.loadAd()
         }
@@ -163,7 +163,7 @@ object AdsManager {
     @JvmOverloads
     fun showInterstitial(
         activity: Activity,
-        count: Int = config.interstitialInterval,
+        count: Int = 1,
         onComplete: () -> Unit
     ) {
         if (isPremium()) {

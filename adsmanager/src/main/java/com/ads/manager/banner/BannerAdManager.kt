@@ -25,7 +25,7 @@ class BannerAdManager(private val config: AdsConfig) {
     ) {
         AdsInitializer.safeInitialize(activity, config.appId)
 
-        if (!MobileAds.isInitialized) {
+        if (config.bannerId.isBlank() || !MobileAds.isInitialized) {
             container.visibility = View.GONE
             onFailed?.invoke()
             return

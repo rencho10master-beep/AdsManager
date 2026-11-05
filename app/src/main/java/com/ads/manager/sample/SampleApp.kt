@@ -11,7 +11,7 @@ class SampleApp : Application() {
 
         val config = AdsConfig(
             appId = "ca-app-pub-3940256099942544~3347511713",
-            interstitialInterval = 2,
+            interstitialId = "ca-app-pub-3940256099942544/1033173712",
             shimmerBaseColor = Color.parseColor("#E0E0E0"),
             shimmerHighlightColor = Color.parseColor("#F5F5F5"),
             dialogBackgroundColor = Color.BLACK,

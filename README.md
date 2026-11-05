@@ -54,13 +54,14 @@ Add your AdMob App ID inside the `<application>` tag:
 
 ## 🚀 3. Initialize in Application Class
 
-In your `Application` class:
+In your `Application` class, configure only the Ad IDs your app needs (all other IDs are optional and will safely never crash):
 
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Example 1: If your app uses ALL ad types
         val config = AdsConfig(
             appId = "ca-app-pub-3940256099942544~3347511713",
             bannerId = "ca-app-pub-3940256099942544/6300978111",
@@ -68,9 +69,16 @@ class MyApplication : Application() {
             nativeId = "ca-app-pub-3940256099942544/2247696110",
             rewardedId = "ca-app-pub-3940256099942544/5224354917",
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-            interstitialInterval = 1
+            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921"
         )
+
+        // Example 2: If your app ONLY uses Interstitial Ad (zero crash guarantee for unadded IDs)
+        /*
+        val config = AdsConfig(
+            appId = "ca-app-pub-3940256099942544~3347511713",
+            interstitialId = "ca-app-pub-3940256099942544/1033173712"
+        )
+        */
 
         // enableResumeAppOpenAd = true automatically handles background-to-foreground ads
         AdsManager.init(this, config, enableResumeAppOpenAd = true)

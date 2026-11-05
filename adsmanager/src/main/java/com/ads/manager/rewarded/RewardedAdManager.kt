@@ -19,6 +19,7 @@ class RewardedAdManager(private val config: AdsConfig) {
     private var isAdLoading = false
 
     fun loadAd(activity: Activity, onLoaded: (() -> Unit)? = null) {
+        if (config.rewardedId.isBlank()) return
         AdsInitializer.safeInitialize(activity, config.appId)
 
         if (!MobileAds.isInitialized || isAdLoading || rewardedAd != null) return
@@ -51,6 +52,11 @@ class RewardedAdManager(private val config: AdsConfig) {
         onUserEarnedReward: (AdReward) -> Unit,
         onClosed: () -> Unit
     ) {
+        if (config.rewardedId.isBlank()) {
+            onClosed()
+            return
+        }
+
         val ad = rewardedAd
         if (ad == null) {
             loadAd(activity)

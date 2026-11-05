@@ -22,6 +22,8 @@ class InterstitialAdManager(
     private var isAdLoading = false
 
     fun loadAd(activity: Activity, onLoaded: (() -> Unit)? = null) {
+        if (config.interstitialId.isBlank()) return
+
         AdsInitializer.safeInitialize(activity, config.appId)
 
         if (!MobileAds.isInitialized || isAdLoading || interstitialAd != null) {
@@ -53,9 +55,15 @@ class InterstitialAdManager(
 
     fun showAd(
         activity: Activity,
-        count: Int = config.interstitialInterval,
+        count: Int = 1,
         onComplete: () -> Unit
     ) {
+        // If interstitialId is empty, safely proceed immediately without crash
+        if (config.interstitialId.isBlank()) {
+            onComplete()
+            return
+        }
+
         // ૧. જો ક્લિક કાઉન્ટ પ્રમાણે Ad બતાવવાની ન હોય
         if (!clickTracker.shouldShowAd(count)) {
             onComplete()

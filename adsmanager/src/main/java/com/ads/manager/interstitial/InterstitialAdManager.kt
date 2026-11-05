@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 import com.ads.manager.AdsConfig
-import com.ads.manager.callback.InterstitialAdCallback
 import com.ads.manager.dialog.AdLoadingDialog
 import com.ads.manager.init.AdsInitializer
 import com.google.android.libraries.ads.mobile.sdk.MobileAds
@@ -55,50 +54,49 @@ class InterstitialAdManager(
     fun showAd(
         activity: Activity,
         count: Int = config.interstitialInterval,
-        callback: InterstitialAdCallback? = null,
         onComplete: () -> Unit
     ) {
+        // ૧. જો ક્લિક કાઉન્ટ પ્રમાણે Ad બતાવવાની ન હોય
         if (!clickTracker.shouldShowAd(count)) {
-            callback?.onInterstitialAdDismissed()
             onComplete()
             return
         }
 
+        // ૨. જો Ad હજુ લોડ નથી થઈ (Fail થઈ હોય) તો નેક્સ્ટ ટાઇમ માટે લોડ કરી તરત onComplete() કોલ કરો
         val ad = interstitialAd
         if (ad == null) {
             loadAd(activity)
-            callback?.onInterstitialAdFailed()
             onComplete()
             return
         }
 
+        // ૩. Loading Dialog બતાવો
         AdLoadingDialog.show(activity, config)
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (activity.isFinishing || activity.isDestroyed) {
                 AdLoadingDialog.dismiss()
-                callback?.onInterstitialAdFailed()
                 onComplete()
                 return@postDelayed
             }
 
             ad.adEventCallback = object : InterstitialAdEventCallback {
+                // ૪. યુઝર Ad ક્લોઝ કરે ત્યારે:
                 override fun onAdDismissedFullScreenContent() {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
                         interstitialAd = null
                         loadAd(activity)
-                        callback?.onInterstitialAdDismissed()
                         onComplete()
                     }
                 }
 
+                // ૫. જો Ad બતાવવામાં ફેલ થાય ત્યારે:
                 override fun onAdFailedToShowFullScreenContent(fullScreenContentError: FullScreenContentError) {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
                         interstitialAd = null
                         loadAd(activity)
-                        callback?.onInterstitialAdFailed()
                         onComplete()
                     }
                 }
@@ -106,13 +104,6 @@ class InterstitialAdManager(
                 override fun onAdShowedFullScreenContent() {
                     activity.runOnUiThread {
                         AdLoadingDialog.dismiss()
-                        callback?.onInterstitialAdShown()
-                    }
-                }
-
-                override fun onAdClicked() {
-                    activity.runOnUiThread {
-                        callback?.onInterstitialAdClicked()
                     }
                 }
             }

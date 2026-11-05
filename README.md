@@ -7,16 +7,16 @@ A clean, standalone, zero-bloat Android Ads Library powered by **Google Mobile A
 - **Two Distinct App Open Ads**:
   1. **Splash App Open Ad**: With `onComplete` callback and configurable timeout (prevents stuck splash screens).
   2. **Resume App Open Ad**: Displays full-screen loading dialog when returning from background / recent apps, then shows the App Open Ad.
-- **Strict `isPremium` / Functions**:
-  - `AdsManager.setPremium(true)` or `AdsManager.setAdsEnabled(false)`.
+- **Strict `isPremium` Mode**:
+  - `AdsManager.isPremium = true` or `AdsManager.updatePremiumStatus(true)` or `AdsManager.setAdsEnabled(false)`.
   - Instantly kills all ad requests and dismisses any loading dialogs.
   - **No Shimmer**: Native / Banner containers are immediately made `GONE` and views removed so user never sees empty gray boxes or loading animations.
   - Interstitial & Splash callbacks fire immediately without delay.
 - **Flexible Interstitial Ad Frequency**:
-  - Show every time (`interval = 1`).
-  - Show every 2 clicks (`interval = 2`).
-  - Show every 3 clicks (`interval = 3`).
-  - Custom `key` per screen/button so click counters never conflict!
+  - `AdsManager.showInterstitial(this, 1) { ... }` -> Show every single click.
+  - `AdsManager.showInterstitial(this, 2) { ... }` -> Show on 1st click, then every 2nd click.
+  - `AdsManager.showInterstitial(this, 3) { ... }` -> Show on 1st click, then every 3rd click.
+  - When ad fails, closes, or skips, `{ ... }` callback fires immediately!
 - **Custom XML Layouts for Native Ads**:
   - Works with any `ViewGroup` (`FrameLayout`, `LinearLayout`, `CardView`, etc.).
   - Supports custom designed XML layouts (`customAdLayoutResId = R.layout.my_layout`).
@@ -43,7 +43,7 @@ class MyApplication : Application() {
             rewardedId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
             splashAppOpenId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
             resumeAppOpenId = "ca-app-pub-xxxxxxxx/yyyyyyyy",
-            interstitialInterval = 2
+            interstitialInterval = 1
         )
 
         // enableResumeAppOpenAd = true automatically handles background-to-foreground ads
@@ -73,27 +73,28 @@ class SplashActivity : AppCompatActivity() {
 
 ---
 
-### 3. Interstitial Ads (Custom Click Count per Screen/Button)
+### 3. Interstitial Ads (Simple Count & Instant Callback)
 ```kotlin
-// Case A: Show EVERY time (Every single click)
-AdsManager.showInterstitial(this, interval = 1) {
-    // Navigate or perform action
+// Har vakhte show karva mate (Count 1):
+AdsManager.showInterstitial(this, 1) {
+    // Ad close thay ya fail thay atyare aa run thase:
+    startActivity(Intent(this, DetailActivity::class.java))
 }
 
-// Case B: Show every 2nd time on Screen B
-AdsManager.showInterstitial(this, interval = 2, key = "screen_b") {
-    // Navigate or perform action
+// Dar 2ji var show karva mate (Count 2):
+AdsManager.showInterstitial(this, 2) {
+    startActivity(Intent(this, DetailActivity::class.java))
 }
 
-// Case C: Show every 3rd time on Screen C
-AdsManager.showInterstitial(this, interval = 3, key = "screen_c") {
-    // Navigate or perform action
+// Dar 3ji var show karva mate (Count 3):
+AdsManager.showInterstitial(this, 3) {
+    startActivity(Intent(this, DetailActivity::class.java))
 }
 ```
 
 ---
 
-### 4. Native Ads (Default, Small, or Custom XML Layout)
+### 4. Native & Banner Ads (Simple - No Callbacks Needed)
 ```kotlin
 // 1. Medium Native Ad (with MediaView & Shimmer)
 AdsManager.showNative(this, binding.nativeAdContainer)
@@ -108,8 +109,8 @@ AdsManager.showNative(
     customAdLayoutResId = R.layout.my_custom_native_ad
 )
 
-// 4. Directly Bind to a NativeAdView in your layout
-AdsManager.bindNative(this, binding.myNativeAdView)
+// 4. Banner Ad (Adaptive size)
+AdsManager.showBanner(this, binding.bannerContainer)
 ```
 
 ---
@@ -117,13 +118,10 @@ AdsManager.bindNative(this, binding.myNativeAdView)
 ### 5. Premium / VIP Mode Functions
 When user buys premium inside PremiumActivity:
 ```kotlin
-// Option 1: Function call
-AdsManager.setPremium(true)
-
-// Option 2: Turn ads off function
-AdsManager.setAdsEnabled(false)
-
-// Option 3: Property assignment
 AdsManager.isPremium = true
+// or
+AdsManager.updatePremiumStatus(true)
+// or
+AdsManager.setAdsEnabled(false)
 ```
 All ads, loading dialogs, and shimmers are instantly dismissed and hidden!

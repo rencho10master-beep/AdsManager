@@ -166,75 +166,68 @@ AdsManager.showInterstitial(this, 3) {
 
 ---
 
-## 🖼️ 7. Native Ads (Large / Medium & Small)
+## 🖼️ 7. Native Ads (Dedicated Custom XML Views)
 
-### Step 1: XML Setup (Activity or Fragment Layout)
-In your XML layout, add a container (`FrameLayout`, `LinearLayout`, or `CardView`):
+Just like `androidx.recyclerview.widget.RecyclerView`, you can directly use our library's custom Native Ad views in your XML layouts. They **automatically display realistic ad previews inside Android Studio's Layout Editor**!
 
+### Step 1: Add Custom View to your XML Layout
 ```xml
-<!-- 1. For Large / Medium Native Ad (around 200dp - 280dp height) -->
-<FrameLayout
-    android:id="@+id/nativeAdContainer"
+<!-- 1. Large Native Ad (with MediaView, Icon, Headline, Body & Shimmer) -->
+<com.ads.manager.nativead.LargeNativeAdView
+    android:id="@+id/largeNativeAd"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp" />
 
-<!-- 2. For Small Native Ad (around 60dp - 90dp height) -->
-<FrameLayout
-    android:id="@+id/smallNativeContainer"
+<!-- 2. Small Native Ad (Compact - no MediaView, ideal for bottom or lists) -->
+<com.ads.manager.nativead.SmallNativeAdView
+    android:id="@+id/smallNativeAd"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp" />
 ```
 
-### Step 2: Kotlin Code
-
+### Step 2: Load Ad in Kotlin Code (Just 1 Line!)
 ```kotlin
-// A. Large / Medium Native Ad (with MediaView, App Icon, Headline, Body & Shimmer):
-AdsManager.showNative(this, binding.nativeAdContainer)
+// Load Large Native Ad:
+binding.largeNativeAd.load(this)
 
-// B. Small Native Ad (Compact - no MediaView, ideal for bottom or lists):
-AdsManager.showNativeSmall(this, binding.smallNativeContainer)
+// Load Small Native Ad:
+binding.smallNativeAd.load(this)
 
-// C. Your Own Custom Designed XML Layout!
-AdsManager.showNative(
-    activity = this,
-    container = binding.customContainer,
-    customAdLayoutResId = R.layout.my_custom_native_ad
-)
+// Or load via AdsManager:
+AdsManager.showNative(this, binding.largeNativeAd)
+AdsManager.showNativeSmall(this, binding.smallNativeAd)
 ```
 
 ---
 
-## 📱 8. Banner Ads (Adaptive, Collapsible, Inline & MREC)
+## 📱 8. Banner Ads (Dedicated Custom XML View)
 
-### Step 1: XML Setup
-In your XML, add a container at the bottom, top, or inside your list/scroll view:
-
+### Step 1: Add Custom BannerAdView in your XML Layout
 ```xml
-<!-- Sticky Bottom Banner Container -->
-<FrameLayout
-    android:id="@+id/bannerContainer"
+<!-- Standard Adaptive Banner at Bottom -->
+<com.ads.manager.banner.BannerAdView
+    android:id="@+id/bannerAdView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom" />
 ```
 
-### Step 2: Kotlin Code
+### Step 2: Load Banner in Kotlin Code
 
 ```kotlin
-// 1. Standard Anchored Adaptive Banner (Sticky bottom / top):
-AdsManager.showBanner(this, binding.bannerContainer)
+// 1. Standard Adaptive Banner:
+binding.bannerAdView.load(this)
 
-// 2. Collapsible Banner (Expands on display for high CTR, then collapses):
-// Position can be "bottom" (default) or "top"
-AdsManager.showCollapsibleBanner(this, binding.bannerContainer, position = "bottom")
+// 2. Collapsible Banner (High CTR - expands on display):
+binding.bannerAdView.loadCollapsible(this, position = "bottom") // or "top"
 
-// 3. Inline Adaptive Banner (Inside RecyclerView or ScrollView items):
-AdsManager.showInlineBanner(this, binding.bannerContainer, maxHeightDp = 100)
+// 3. Inline Adaptive Banner (for RecyclerView or Scrollable lists):
+binding.bannerAdView.loadInline(this, maxHeightDp = 100)
 
 // 4. Medium Rectangle Banner (MREC 300x250):
-AdsManager.showMediumRectangleBanner(this, binding.bannerContainer)
+binding.bannerAdView.loadMediumRectangle(this)
 ```
 
 ---

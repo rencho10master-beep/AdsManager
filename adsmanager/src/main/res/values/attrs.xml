@@ -5,4 +5,20 @@
         <attr name="shimmerHighlightColor" format="color" />
         <attr name="shimmerDuration" format="integer" />
     </declare-styleable>
+
+    <declare-styleable name="NativeAdContainerView">
+        <attr name="nativeType" format="enum">
+            <enum name="large" value="0" />
+            <enum name="small" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="BannerAdView">
+        <attr name="bannerType" format="enum">
+            <enum name="adaptive" value="0" />
+            <enum name="collapsible" value="1" />
+            <enum name="inline" value="2" />
+            <enum name="mrec" value="3" />
+        </attr>
+    </declare-styleable>
 </resources>

@@ -20,6 +20,10 @@ A high-performance AdMob Ads Library designed to work seamlessly across both **N
 
 Complete guide for Native Android projects using Kotlin/Java and dedicated XML custom views.
 
+> [!NOTE]
+> **Broad SDK Compatibility:** Supports **API 24 to API 37** (Android 7.0 Nougat to Android 16). 
+> The library defines `aarMetadata.minCompileSdk = 24`, meaning any app compiling against API 24, 28, 30, 32, 33, 34, 35, 36, or 37 can use it without metadata rejection.
+
 ---
 
 ### 1. Add JitPack in `settings.gradle`
@@ -204,6 +208,27 @@ AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
 }
 ```
 
+#### 🇪🇺 Google UMP GDPR Consent (European Union & UK)
+Call this in your `SplashActivity` before loading ads. It automatically presents Google's official consent form for users in EEA & UK, and skips automatically for users in other countries (India, US, etc.):
+
+```kotlin
+// In SplashActivity.onCreate()
+AdsManager.requestConsent(this) { canRequestAds ->
+    // Consent finished or skipped -> safely load & show splash ad!
+    AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
+        startActivity(Intent(this, MainActivity::class.java))
+        finish()
+    }
+}
+```
+
+If you have a "Privacy Settings" option inside your app's Settings screen:
+```kotlin
+AdsManager.showPrivacyOptions(this) {
+    // User updated their consent preferences
+}
+```
+
 #### 🛡️ Private DNS (AdBlock) Detection
 ```kotlin
 // Returns true if AdBlock Private DNS (AdGuard, NextDNS) is active, false otherwise
@@ -368,6 +393,15 @@ AdsManager.loadAndShowSplashAppOpenAd(
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   },
 );
+```
+
+#### 🇪🇺 Google UMP GDPR Consent in Flutter
+```dart
+// Check & show Google Consent dialog on app launch:
+bool canRequestAds = await AdsManager.requestConsent();
+
+// If you have a Privacy Settings button in settings screen:
+await AdsManager.showPrivacyOptions();
 ```
 
 #### 🛡️ Private DNS (AdBlocker) Check in Flutter

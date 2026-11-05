@@ -91,6 +91,28 @@ class AdsManagerFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
                 result.success(isDns)
             }
 
+            "requestConsent" -> {
+                val act = activity
+                if (act == null) {
+                    result.success(true)
+                    return
+                }
+                AdsManager.requestConsent(act) { canRequestAds ->
+                    result.success(canRequestAds)
+                }
+            }
+
+            "showPrivacyOptions" -> {
+                val act = activity
+                if (act == null) {
+                    result.success(true)
+                    return
+                }
+                AdsManager.showPrivacyOptions(act) {
+                    result.success(true)
+                }
+            }
+
             "showInterstitial" -> {
                 val act = activity
                 val count = call.argument<Int>("count") ?: 1

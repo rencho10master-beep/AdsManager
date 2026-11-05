@@ -53,6 +53,25 @@ class AdsManager {
     }
   }
 
+  /// Request Google UMP GDPR Consent (Required for EEA / UK users).
+  /// Automatically shows consent dialog if required, skips for non-EEA users.
+  /// Returns true if ads can be requested.
+  static Future<bool> requestConsent() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('requestConsent');
+      return res ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Show Privacy Options Form (allows user to change their consent from Settings screen).
+  static Future<void> showPrivacyOptions() async {
+    try {
+      await _channel.invokeMethod('showPrivacyOptions');
+    } catch (_) {}
+  }
+
   /// Show Interstitial Ad with frequency count.
   /// [count] = 1: Shows every time.
   /// [count] = 2: Shows every 2nd click.

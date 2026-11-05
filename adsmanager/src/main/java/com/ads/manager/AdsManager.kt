@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import com.ads.manager.appopen.ResumeAppOpenManager
 import com.ads.manager.appopen.SplashAppOpenManager
 import com.ads.manager.banner.BannerAdManager
+import com.ads.manager.consent.ConsentManager
 import com.ads.manager.dialog.AdLoadingDialog
 import com.ads.manager.dns.DnsHelper
 import com.ads.manager.init.AdsInitializer
@@ -93,6 +94,30 @@ object AdsManager {
     @JvmStatic
     fun checkDNS(context: Context): Boolean {
         return DnsHelper.isPrivateDnsEnabled(context)
+    }
+
+    /**
+     * Request Google UMP GDPR Consent (Required for European Union & UK users).
+     * Automatically displays Google Consent form if user is in EU/EEA/UK.
+     * Skips automatically for other countries (e.g. India, US).
+     * @param onComplete Callback with boolean indicating if ads can be requested.
+     */
+    @JvmStatic
+    fun requestConsent(activity: Activity, onComplete: (canRequestAds: Boolean) -> Unit) {
+        ConsentManager.requestConsent(activity, onComplete)
+    }
+
+    /**
+     * Show Privacy Options Form (allows user to change their consent from Settings screen).
+     */
+    @JvmStatic
+    fun showPrivacyOptions(activity: Activity, onDismissed: (() -> Unit)? = null) {
+        ConsentManager.showPrivacyOptionsForm(activity, onDismissed)
+    }
+
+    @JvmStatic
+    fun canRequestAds(activity: Activity): Boolean {
+        return ConsentManager.canRequestAds(activity)
     }
 
     fun init(

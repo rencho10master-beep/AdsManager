@@ -10,10 +10,168 @@ A single unified AdMob Ads library that works seamlessly for **Native Android (K
 ---
 
 ## 📑 Quick Navigation
-- [🐦 Flutter Integration Guide (Dart & Widgets)](#-flutter-integration-guide)
 - [🤖 Native Android Integration Guide (Kotlin & XML)](#-native-android-integration-guide)
+- [🐦 Flutter Integration Guide (Dart & Widgets)](#-flutter-integration-guide)
 - [🛡️ Private DNS (AdBlock) Detection](#-private-dns-adblock-detection)
 - [💎 Instant Premium Mode](#-instant-premium-mode)
+
+---
+
+# 🤖 Native Android Integration Guide
+
+### 1. Add JitPack in `settings.gradle`
+In your root `settings.gradle` (or `settings.gradle.kts`):
+
+```groovy
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' } // <-- Add this line
+    }
+}
+```
+
+### 2. Add Dependency in app `build.gradle`
+In your app's `build.gradle` (or `build.gradle.kts`):
+
+```groovy
+dependencies {
+    implementation 'com.github.rencho10master-beep:AdsManager:1.0.0'
+}
+```
+
+### 3. Configure `AndroidManifest.xml`
+Add your AdMob App ID inside the `<application>` tag:
+
+```xml
+<manifest>
+    <application>
+        <!-- AdMob App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy" />
+    </application>
+</manifest>
+```
+
+### 4. Initialize in `Application` class
+In your `Application` class, configure only the Ad IDs you need (omitted IDs will safely not crash):
+
+```kotlin
+class MyApplication : Application() {
+    override fun onCreate() {
+        super.onCreate()
+
+        val config = AdsConfig(
+            appId = "ca-app-pub-3940256099942544~3347511713",
+            bannerId = "ca-app-pub-3940256099942544/6300978111",
+            interstitialId = "ca-app-pub-3940256099942544/1033173712",
+            nativeId = "ca-app-pub-3940256099942544/2247696110",
+            rewardedId = "ca-app-pub-3940256099942544/5224354917",
+            splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
+            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
+
+            // 🎨 Shimmer Colors
+            shimmerBaseColor = Color.parseColor("#E0E0E0"),
+            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
+
+            // ⏳ Custom Ad Loading Dialog
+            dialogBackgroundColor = Color.parseColor("#CC000000"),
+            dialogTextColor = Color.WHITE,
+            dialogLoadingText = "Ad is loading…",
+
+            // 🎨 Native Ad Complete Customization
+            nativeBackgroundColor = Color.WHITE,                   // Native Ad Background
+            nativeHeadlineColor = Color.BLACK,                     // Headline / Title text color
+            nativeBodyColor = Color.parseColor("#666666"),         // Body text color
+            nativeAdBadgeBgColor = Color.parseColor("#FFCC00"),    // "Ad" badge background
+            nativeAdBadgeTextColor = Color.BLACK,                  // "Ad" badge text color
+            nativeCtaBgColor = Color.parseColor("#1A73E8"),        // Install button background color
+            nativeCtaTextColor = Color.WHITE,                      // Install button text color
+
+            // 🔤 Font Family from res/font/ folder (e.g. res/font/my_font.ttf)
+            nativeFontResId = R.font.my_font                       // Pass R.font directly!
+        )
+
+        AdsManager.init(this, config)
+    }
+}
+```
+
+### 5. Dedicated Custom Views in XML (Shows Live Mockups in Android Studio Preview!)
+
+#### 🖼️ Large Native Ad View
+```xml
+<com.ads.manager.nativead.LargeNativeAdView
+    android:id="@+id/largeNativeAdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+```
+Load in Kotlin:
+```kotlin
+binding.largeNativeAdView.load(this)
+```
+
+#### 🖼️ Small Native Ad View
+```xml
+<com.ads.manager.nativead.SmallNativeAdView
+    android:id="@+id/smallNativeAdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+```
+Load in Kotlin:
+```kotlin
+binding.smallNativeAdView.load(this)
+```
+
+#### 📢 Dedicated Banner View
+```xml
+<!-- Adaptive Banner -->
+<com.ads.manager.banner.BannerAdView
+    android:id="@+id/bannerAdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:bannerType="adaptive" />
+
+<!-- Collapsible Banner -->
+<com.ads.manager.banner.BannerAdView
+    android:id="@+id/collapsibleBannerView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:bannerType="collapsible" />
+```
+Load in Kotlin:
+```kotlin
+binding.bannerAdView.load(this)
+```
+
+### 6. Native Android Ad Actions
+
+#### 🎬 Show Interstitial Ad (Always calls callback on close, fail, or skip)
+```kotlin
+AdsManager.showInterstitial(this, count = 1) {
+    // Next Screen / Action
+    startActivity(Intent(this, DetailActivity::class.java))
+}
+```
+
+#### 🛡️ Private DNS Detection
+```kotlin
+if (AdsManager.isDNS(this)) {
+    // User has AdBlock Private DNS active
+}
+```
+
+#### 💎 Instant Premium Toggle
+```kotlin
+// Instantly kills all ads and dismisses dialogs
+AdsManager.isPremium(true)
+
+// Check status
+val isVip = AdsManager.isPremium()
+```
 
 ---
 
@@ -77,7 +235,7 @@ void main() async {
       nativeAdBadgeTextColor: "#000000",     // "Ad" badge text color
       nativeCtaBgColor: "#1A73E8",           // Install button background color
       nativeCtaTextColor: "#FFFFFF",         // Install button text color
-      nativeFontFamilyName: "sans-serif",    // Font family for all ad text
+      nativeFontFamilyName: "my_font",       // Font from res/font/ or system
     ),
   );
 
@@ -167,139 +325,6 @@ await AdsManager.isPremium(true);
 
 // Check if user is premium
 bool isPremium = await AdsManager.isPremium();
-```
-
----
-
-# 🤖 Native Android Integration Guide
-
-### 1. Add JitPack in `settings.gradle`
-```groovy
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-}
-```
-
-### 2. Add Dependency in app `build.gradle`
-```groovy
-dependencies {
-    implementation 'com.github.rencho10master-beep:AdsManager:1.0.0'
-}
-```
-
-### 3. Initialize in `Application` class
-```kotlin
-class MyApplication : Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-        val config = AdsConfig(
-            appId = "ca-app-pub-3940256099942544~3347511713",
-            bannerId = "ca-app-pub-3940256099942544/6300978111",
-            interstitialId = "ca-app-pub-3940256099942544/1033173712",
-            nativeId = "ca-app-pub-3940256099942544/2247696110",
-            rewardedId = "ca-app-pub-3940256099942544/5224354917",
-            splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-
-            // 🎨 Shimmer Colors
-            shimmerBaseColor = Color.parseColor("#E0E0E0"),
-            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
-
-            // 🎨 Native Ad Complete Customization
-            nativeBackgroundColor = Color.WHITE,                   // Native Ad Background
-            nativeHeadlineColor = Color.BLACK,                     // Headline / Title text color
-            nativeBodyColor = Color.parseColor("#666666"),         // Body text color
-            nativeAdBadgeBgColor = Color.parseColor("#FFCC00"),    // "Ad" badge background
-            nativeAdBadgeTextColor = Color.BLACK,                  // "Ad" badge text color
-            nativeCtaBgColor = Color.parseColor("#1A73E8"),        // Install button background color
-            nativeCtaTextColor = Color.WHITE,                      // Install button text color
-
-            // 🔤 Font Family from res/font/ folder (e.g. res/font/my_font.ttf)
-            nativeFontResId = R.font.my_font                       // Pass R.font directly!
-        )
-
-        AdsManager.init(this, config)
-    }
-}
-```
-
-### 4. Dedicated Custom Views in XML (Shows Live Mockups in Android Studio Preview!)
-
-#### 🖼️ Large Native Ad View
-```xml
-<com.ads.manager.nativead.LargeNativeAdView
-    android:id="@+id/largeNativeAdView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
-```
-Load in Kotlin:
-```kotlin
-binding.largeNativeAdView.load(this)
-```
-
-#### 🖼️ Small Native Ad View
-```xml
-<com.ads.manager.nativead.SmallNativeAdView
-    android:id="@+id/smallNativeAdView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" />
-```
-Load in Kotlin:
-```kotlin
-binding.smallNativeAdView.load(this)
-```
-
-#### 📢 Dedicated Banner View
-```xml
-<!-- Adaptive Banner -->
-<com.ads.manager.banner.BannerAdView
-    android:id="@+id/bannerAdView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:bannerType="adaptive" />
-
-<!-- Collapsible Banner -->
-<com.ads.manager.banner.BannerAdView
-    android:id="@+id/collapsibleBannerView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:bannerType="collapsible" />
-```
-Load in Kotlin:
-```kotlin
-binding.bannerAdView.load(this)
-```
-
-### 5. Native Android Ad Actions
-
-#### 🎬 Show Interstitial Ad (Always calls callback on close, fail, or skip)
-```kotlin
-AdsManager.showInterstitial(this, count = 1) {
-    // Next Screen / Action
-    startActivity(Intent(this, DetailActivity::class.java))
-}
-```
-
-#### 🛡️ Private DNS Detection
-```kotlin
-if (AdsManager.isDNS(this)) {
-    // User has AdBlock Private DNS active
-}
-```
-
-#### 💎 Instant Premium Toggle
-```kotlin
-// Instantly kills all ads and dismisses dialogs
-AdsManager.isPremium(true)
-
-// Check status
-val isVip = AdsManager.isPremium()
 ```
 
 ---

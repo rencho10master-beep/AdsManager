@@ -61,7 +61,7 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Example 1: If your app uses ALL ad types
+        // Example 1: Full Configuration with Custom Colors & Dialog Styling
         val config = AdsConfig(
             appId = "ca-app-pub-3940256099942544~3347511713",
             bannerId = "ca-app-pub-3940256099942544/6300978111",
@@ -69,7 +69,18 @@ class MyApplication : Application() {
             nativeId = "ca-app-pub-3940256099942544/2247696110",
             rewardedId = "ca-app-pub-3940256099942544/5224354917",
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921"
+            resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
+
+            // 🎨 Custom Shimmer Colors
+            shimmerBaseColor = Color.parseColor("#E0E0E0"),
+            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
+
+            // ⏳ Custom Ad Loading Dialog (shown before Interstitial & Resume App Open)
+            dialogBackgroundColor = Color.parseColor("#CC000000"), // Background overlay color
+            dialogTextColor = Color.WHITE,                         // Loading text color
+            dialogProgressColor = Color.WHITE,                     // Spinner/Progress color
+            dialogLoadingText = "Ad is loading…",                  // Message
+            showDialogProgressBar = true                           // Enable/disable spinner
         )
 
         // Example 2: If your app ONLY uses Interstitial Ad (zero crash guarantee for unadded IDs)

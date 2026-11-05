@@ -12,9 +12,14 @@ data class AdsConfig(
     val splashAppOpenId: String = "",
     val resumeAppOpenId: String = "",
 
+    // Shimmer Colors Customization
     @param:ColorInt val shimmerBaseColor: Int = Color.parseColor("#E0E0E0"),
     @param:ColorInt val shimmerHighlightColor: Int = Color.parseColor("#F5F5F5"),
-    @param:ColorInt val dialogBackgroundColor: Int = Color.BLACK,
+
+    // Ad Loading Dialog Customization
+    @param:ColorInt val dialogBackgroundColor: Int = Color.parseColor("#CC000000"), // Translucent dark overlay
     @param:ColorInt val dialogTextColor: Int = Color.WHITE,
-    val dialogLoadingText: String = "Ad is loading…"
+    @param:ColorInt val dialogProgressColor: Int = Color.WHITE,
+    val dialogLoadingText: String = "Ad is loading…",
+    val showDialogProgressBar: Boolean = true
 )

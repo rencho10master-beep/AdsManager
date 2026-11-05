@@ -51,8 +51,14 @@ class InterstitialAdManager(
         )
     }
 
-    fun showAd(activity: Activity, onComplete: () -> Unit) {
-        if (!clickTracker.shouldShowAd()) {
+    fun showAd(
+        activity: Activity,
+        interval: Int = config.interstitialInterval,
+        key: String? = null,
+        onComplete: () -> Unit
+    ) {
+        val trackingKey = key ?: "interval_$interval"
+        if (!clickTracker.shouldShowAd(interval, trackingKey)) {
             onComplete()
             return
         }
@@ -101,5 +107,10 @@ class InterstitialAdManager(
 
             ad.show(activity)
         }, 600)
+    }
+
+    fun clearAd() {
+        interstitialAd = null
+        isAdLoading = false
     }
 }

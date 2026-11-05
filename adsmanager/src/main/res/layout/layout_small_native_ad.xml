@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nativeAdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/adAttribution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#FFCC00"
+                android:paddingStart="4dp"
+                android:paddingTop="1dp"
+                android:paddingEnd="4dp"
+                android:paddingBottom="1dp"
+                android:text="@string/ad_attribution"
+                android:textColor="@android:color/black"
+                android:textSize="9sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/adAppIcon"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_marginTop="4dp"
+                android:contentDescription="Ad Icon"
+                tools:srcCompat="@android:drawable/sym_def_app_icon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/adHeadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@android:color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="App Name or Headline" />
+
+            <TextView
+                android:id="@+id/adBody"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="#666666"
+                android:textSize="12sp"
+                tools:text="Explore this great app with wonderful tools and features." />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/adCallToAction"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:backgroundTint="@color/ad_button_color"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/ad_button_text_color"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="OPEN" />
+    </LinearLayout>
+</com.google.android.libraries.ads.mobile.sdk.nativead.NativeAdView>

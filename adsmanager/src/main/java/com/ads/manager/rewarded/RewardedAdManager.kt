@@ -98,4 +98,9 @@ class RewardedAdManager(private val config: AdsConfig) {
             }
         )
     }
+
+    fun clearAd() {
+        rewardedAd = null
+        isAdLoading = false
+    }
 }

@@ -26,8 +26,8 @@ class NativeAdManager(private val config: AdsConfig) {
     fun showNativeAd(
         activity: Activity,
         container: ViewGroup,
-        customShimmerResId: Int? = null,
         customAdLayoutResId: Int? = null,
+        customShimmerResId: Int? = null,
         onLoaded: (() -> Unit)? = null,
         onFailed: (() -> Unit)? = null
     ) {
@@ -78,14 +78,21 @@ class NativeAdManager(private val config: AdsConfig) {
                         shimmerContainer?.stopShimmer()
                         container.removeAllViews()
 
-                        val adView = inflater.inflate(
+                        val inflatedLayout = inflater.inflate(
                             customAdLayoutResId ?: R.layout.layout_default_native_ad,
                             container,
                             false
-                        ) as NativeAdView
+                        )
 
-                        bindNativeAdView(nativeAd, adView)
-                        container.addView(adView)
+                        val nativeAdView = resolveNativeAdView(activity, inflatedLayout)
+                        bindNativeAdView(nativeAd, nativeAdView)
+
+                        val viewToAdd = if (nativeAdView.parent != null) {
+                            inflatedLayout
+                        } else {
+                            nativeAdView
+                        }
+                        container.addView(viewToAdd)
                         onLoaded?.invoke()
                     }
                 }
@@ -101,12 +108,104 @@ class NativeAdManager(private val config: AdsConfig) {
         )
     }
 
+    fun showNativeSmall(
+        activity: Activity,
+        container: ViewGroup,
+        onLoaded: (() -> Unit)? = null,
+        onFailed: (() -> Unit)? = null
+    ) {
+        showNativeAd(
+            activity = activity,
+            container = container,
+            customAdLayoutResId = R.layout.layout_small_native_ad,
+            customShimmerResId = R.layout.layout_shimmer_small_native,
+            onLoaded = onLoaded,
+            onFailed = onFailed
+        )
+    }
+
+    fun bindNativeAd(
+        activity: Activity,
+        nativeAdView: NativeAdView,
+        onLoaded: (() -> Unit)? = null,
+        onFailed: (() -> Unit)? = null
+    ) {
+        AdsInitializer.safeInitialize(activity, config.appId)
+
+        if (!MobileAds.isInitialized) {
+            nativeAdView.visibility = View.GONE
+            onFailed?.invoke()
+            return
+        }
+
+        val adRequest = NativeAdRequest.Builder(
+            config.nativeId,
+            listOf(NativeAd.NativeAdType.NATIVE)
+        ).setAdChoicesPlacement(AdChoicesPlacement.TOP_RIGHT)
+         .build()
+
+        NativeAdLoader.load(
+            adRequest,
+            object : NativeAdLoaderCallback {
+                override fun onNativeAdLoaded(nativeAd: NativeAd) {
+                    activity.runOnUiThread {
+                        if (activity.isFinishing || activity.isDestroyed) {
+                            nativeAd.destroy()
+                            return@runOnUiThread
+                        }
+                        bindNativeAdView(nativeAd, nativeAdView)
+                        nativeAdView.visibility = View.VISIBLE
+                        onLoaded?.invoke()
+                    }
+                }
+
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    activity.runOnUiThread {
+                        nativeAdView.visibility = View.GONE
+                        onFailed?.invoke()
+                    }
+                }
+            }
+        )
+    }
+
+    private fun resolveNativeAdView(activity: Activity, view: View): NativeAdView {
+        if (view is NativeAdView) {
+            return view
+        }
+
+        val found = findNativeAdView(view)
+        if (found != null) {
+            return found
+        }
+
+        val wrapper = NativeAdView(activity)
+        wrapper.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        wrapper.addView(view)
+        return wrapper
+    }
+
+    private fun findNativeAdView(view: View): NativeAdView? {
+        if (view is NativeAdView) return view
+        if (view is ViewGroup) {
+            for (i in 0 until view.childCount) {
+                val child = view.getChildAt(i)
+                val found = findNativeAdView(child)
+                if (found != null) return found
+            }
+        }
+        return null
+    }
+
     private fun bindNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
-        val headlineView = adView.findViewById<TextView>(R.id.adHeadline)
-        val bodyView = adView.findViewById<TextView>(R.id.adBody)
-        val callToActionView = adView.findViewById<Button>(R.id.adCallToAction)
-        val iconView = adView.findViewById<ImageView>(R.id.adAppIcon)
-        val mediaView = adView.findViewById<MediaView>(R.id.adMedia)
+        val headlineView = adView.findViewById<TextView>(R.id.adHeadline) ?: adView.findViewWithTag("adHeadline")
+        val bodyView = adView.findViewById<TextView>(R.id.adBody) ?: adView.findViewWithTag("adBody")
+        val callToActionView = adView.findViewById<Button>(R.id.adCallToAction) ?: adView.findViewWithTag("adCallToAction")
+        val iconView = adView.findViewById<ImageView>(R.id.adAppIcon) ?: adView.findViewWithTag("adAppIcon")
+        val mediaView = adView.findViewById<MediaView>(R.id.adMedia) ?: adView.findViewWithTag("adMedia")
 
         headlineView?.let {
             it.text = nativeAd.headline
@@ -144,12 +243,9 @@ class NativeAdManager(private val config: AdsConfig) {
             }
         }
 
-        val mediaContent = nativeAd.mediaContent
-        if (mediaView != null && (mediaContent.hasVideoContent || mediaContent.mainImage != null)) {
-            mediaView.visibility = View.VISIBLE
-            mediaView.mediaContent = mediaContent
-        } else {
-            mediaView?.visibility = View.GONE
+        mediaView?.let { mv ->
+            mv.visibility = View.VISIBLE
+            mv.mediaContent = nativeAd.mediaContent
         }
 
         adView.registerNativeAd(nativeAd, mediaView)

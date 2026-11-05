@@ -42,7 +42,7 @@ class ResumeAppOpenManager(
     }
 
     fun loadAd() {
-        if (AdsManager.isPremium) return
+        if (AdsManager.isPremium()) return
         if (isAdAvailable() || isAdLoading) return
 
         AdsInitializer.safeInitialize(application, config.appId)
@@ -74,7 +74,7 @@ class ResumeAppOpenManager(
     }
 
     private fun showAdIfAvailable() {
-        if (AdsManager.isPremium || isShowingAd) return
+        if (AdsManager.isPremium() || isShowingAd) return
 
         val activity = currentActivity ?: return
         if (activity.isFinishing || activity.isDestroyed) return

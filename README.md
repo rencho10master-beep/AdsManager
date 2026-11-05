@@ -200,11 +200,18 @@ AdsManager.showRewarded(
 When user purchases subscription in PremiumActivity:
 
 ```kotlin
-// Option 1: Property
-AdsManager.isPremium = true
+// Option 1: Function (Set Premium status)
+AdsManager.isPremium(true)  // Instantly disables and removes all ads & shimmers!
+AdsManager.isPremium(false) // Normal free mode
 
-// Option 2: Function
-AdsManager.updatePremiumStatus(true)
+// Check Premium status anywhere:
+if (AdsManager.isPremium()) {
+    // User is Premium
+}
+
+// Option 2: Disable Ads function
+AdsManager.setAdsEnabled(false) // Turns off all ads
+```
 
 // Option 3: Disable Ads function
 AdsManager.setAdsEnabled(false)

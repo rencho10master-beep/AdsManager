@@ -43,12 +43,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnTogglePremium.setOnClickListener {
-            AdsManager.isPremium = !AdsManager.isPremium
-            val status = if (AdsManager.isPremium) "Premium (No Ads/Shimmer)" else "Free"
+            val newStatus = !AdsManager.isPremium()
+            AdsManager.isPremium(newStatus)
+            val status = if (newStatus) "Premium (No Ads/Shimmer)" else "Free"
             binding.btnTogglePremium.text = "Toggle Premium (Current: $status)"
             Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
 
-            if (AdsManager.isPremium) {
+            if (!newStatus) {
                 AdsManager.showBanner(this, binding.bannerContainer)
                 AdsManager.showNative(this, binding.nativeAdContainer)
             }

@@ -2,12 +2,14 @@ package com.ads.manager
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import com.ads.manager.appopen.ResumeAppOpenManager
 import com.ads.manager.appopen.SplashAppOpenManager
 import com.ads.manager.banner.BannerAdManager
 import com.ads.manager.dialog.AdLoadingDialog
+import com.ads.manager.dns.DnsHelper
 import com.ads.manager.init.AdsInitializer
 import com.ads.manager.interstitial.AdClickTracker
 import com.ads.manager.interstitial.InterstitialAdManager
@@ -27,33 +29,32 @@ object AdsManager {
     private var splashAppOpenManager: SplashAppOpenManager? = null
     private var resumeAppOpenManager: ResumeAppOpenManager? = null
 
-    @JvmStatic
     @Volatile
-    var isPremium: Boolean = false
-        set(value) {
-            field = value
-            if (value) {
-                // Instantly dismiss any loading dialogs and clear ads
-                AdLoadingDialog.dismiss()
-                interstitialManager?.clearAd()
-                rewardedManager?.clearAd()
-            }
-        }
-
-    @JvmStatic
-    var isSubscribed: Boolean
-        get() = isPremium
-        set(value) {
-            isPremium = value
-        }
+    private var _isPremium: Boolean = false
 
     /**
-     * Helper function to update premium status.
-     * When set to true, all ads and shimmers are immediately killed and disabled.
+     * Function to set Premium status:
+     * AdsManager.isPremium(true) -> Instantly kills all ads and shimmers!
+     * AdsManager.isPremium(false) -> Normal ads mode.
      */
     @JvmStatic
-    fun updatePremiumStatus(premium: Boolean) {
-        isPremium = premium
+    fun isPremium(premium: Boolean) {
+        _isPremium = premium
+        if (premium) {
+            // Instantly dismiss any loading dialogs and clear ads
+            AdLoadingDialog.dismiss()
+            interstitialManager?.clearAd()
+            rewardedManager?.clearAd()
+        }
+    }
+
+    /**
+     * Function to check if user is Premium:
+     * if (AdsManager.isPremium()) { ... }
+     */
+    @JvmStatic
+    fun isPremium(): Boolean {
+        return _isPremium
     }
 
     /**
@@ -61,15 +62,15 @@ object AdsManager {
      */
     @JvmStatic
     fun setAdsEnabled(enabled: Boolean) {
-        isPremium = !enabled
+        isPremium(!enabled)
     }
 
     @JvmStatic
     fun isAdsEnabled(): Boolean {
-        return !isPremium
+        return !_isPremium
     }
 
-    private var applicationContext: android.content.Context? = null
+    private var applicationContext: Context? = null
 
     /**
      * Variable to check if Private DNS is enabled (ON).
@@ -78,20 +79,20 @@ object AdsManager {
      */
     @JvmStatic
     val isDNS: Boolean
-        get() = applicationContext?.let { com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(it) } ?: false
+        get() = applicationContext?.let { DnsHelper.isPrivateDnsEnabled(it) } ?: false
 
     /**
      * Check if Private DNS is enabled by passing Context:
      * e.g. AdsManager.isDNS(this) or AdsManager.checkDNS(this)
      */
     @JvmStatic
-    fun isDNS(context: android.content.Context): Boolean {
-        return com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(context)
+    fun isDNS(context: Context): Boolean {
+        return DnsHelper.isPrivateDnsEnabled(context)
     }
 
     @JvmStatic
-    fun checkDNS(context: android.content.Context): Boolean {
-        return com.ads.manager.dns.DnsHelper.isPrivateDnsEnabled(context)
+    fun checkDNS(context: Context): Boolean {
+        return DnsHelper.isPrivateDnsEnabled(context)
     }
 
     fun init(
@@ -118,14 +119,14 @@ object AdsManager {
     }
 
     fun preloadAds(activity: Activity) {
-        if (isPremium) return
+        if (isPremium()) return
         interstitialManager?.loadAd(activity)
         rewardedManager?.loadAd(activity)
         resumeAppOpenManager?.loadAd()
     }
 
     fun loadSplashAppOpenAd(activity: Activity, onLoaded: (() -> Unit)? = null) {
-        if (isPremium) {
+        if (isPremium()) {
             onLoaded?.invoke()
             return
         }
@@ -133,7 +134,7 @@ object AdsManager {
     }
 
     fun showSplashAppOpenAd(activity: Activity, onComplete: () -> Unit) {
-        if (isPremium) {
+        if (isPremium()) {
             onComplete()
             return
         }
@@ -145,7 +146,7 @@ object AdsManager {
         timeoutMs: Long = 6000L,
         onComplete: () -> Unit
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             onComplete()
             return
         }
@@ -165,7 +166,7 @@ object AdsManager {
         count: Int = config.interstitialInterval,
         onComplete: () -> Unit
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             onComplete()
             return
         }
@@ -183,7 +184,7 @@ object AdsManager {
         customAdLayoutResId: Int? = null,
         customShimmerResId: Int? = null
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             container.removeAllViews()
             container.visibility = View.GONE
             return
@@ -203,7 +204,7 @@ object AdsManager {
         activity: Activity,
         container: ViewGroup
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             container.removeAllViews()
             container.visibility = View.GONE
             return
@@ -218,7 +219,7 @@ object AdsManager {
         activity: Activity,
         nativeAdView: NativeAdView
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             nativeAdView.visibility = View.GONE
             return
         }
@@ -229,7 +230,7 @@ object AdsManager {
         activity: Activity,
         container: ViewGroup
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             container.removeAllViews()
             container.visibility = View.GONE
             return
@@ -242,7 +243,7 @@ object AdsManager {
         onEarned: (AdReward) -> Unit,
         onClosed: () -> Unit
     ) {
-        if (isPremium) {
+        if (isPremium()) {
             onClosed()
             return
         }

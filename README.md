@@ -1,67 +1,189 @@
-# AdsManager Android Library
+# AdsManager (Android & Flutter Dual Library) 🚀
 
 [![](https://jitpack.io/v/rencho10master-beep/AdsManager.svg)](https://jitpack.io/#rencho10master-beep/AdsManager)
-[![API](https://img.shields.io/badge/API-24%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=24)
+[![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
+[![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-02569B.svg?style=flat&logo=flutter)](https://flutter.dev)
 [![CompileSdk](https://img.shields.io/badge/compileSdk-37-blue.svg)](https://developer.android.com)
 
-A clean, standalone, zero-bloat Android Ads Library powered by **Google Mobile Ads (Next-Gen SDK v1.6.0)** with **compileSdk = 37**.
+A single unified AdMob Ads library that works seamlessly for **Native Android (Kotlin/Java & Custom XML Views)** and **Flutter (Dart & Pure Widgets - ZERO XML needed!)**.
 
 ---
 
-## 📦 1. Installation (Add Dependency)
+## 📑 Quick Navigation
+- [🐦 Flutter Integration Guide (Dart & Widgets)](#-flutter-integration-guide)
+- [🤖 Native Android Integration Guide (Kotlin & XML)](#-native-android-integration-guide)
+- [🛡️ Private DNS (AdBlock) Detection](#-private-dns-adblock-detection)
+- [💎 Instant Premium Mode](#-instant-premium-mode)
 
-### Step 1: Add JitPack repository
-In your root `settings.gradle` (or `settings.gradle.kts`):
+---
 
+# 🐦 Flutter Integration Guide
+
+### 1. Add Dependency in Flutter `pubspec.yaml`
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  ads_manager:
+    git:
+      url: https://github.com/rencho10master-beep/AdsManager.git
+```
+
+### 2. Configure `android/app/src/main/AndroidManifest.xml`
+```xml
+<manifest>
+    <application>
+        <!-- Your AdMob App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+    </application>
+</manifest>
+```
+
+### 3. Initialize in `main.dart`
+```dart
+import 'package:flutter/material.dart';
+import 'package:ads_manager/ads_manager.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize AdsManager
+  await AdsManager.init(
+    const AdsConfig(
+      appId: "ca-app-pub-3940256099942544~3347511713",
+      bannerId: "ca-app-pub-3940256099942544/6300978111",
+      interstitialId: "ca-app-pub-3940256099942544/1033173712",
+      nativeId: "ca-app-pub-3940256099942544/2247696110",
+      rewardedId: "ca-app-pub-3940256099942544/5224354917",
+      splashAppOpenId: "ca-app-pub-3940256099942544/9257395921",
+      resumeAppOpenId: "ca-app-pub-3940256099942544/9257395921",
+
+      // Optional: Shimmer colors & Dialog styling
+      shimmerBaseColor: "#E0E0E0",
+      shimmerHighlightColor: "#F5F5F5",
+      dialogLoadingText: "Ad is loading...",
+    ),
+  );
+
+  runApp(const MyApp());
+}
+```
+
+### 4. Flutter Widgets (Zero XML! Pure Dart Widgets)
+
+#### 🖼️ Native Ad Widget (Large & Small)
+```dart
+// 1. Large Native Ad (with MediaView, App Icon, Headline, Body, Call-To-Action)
+const NativeAdWidget(type: NativeType.large)
+
+// 2. Small Native Ad (compact view for lists)
+const NativeAdWidget(type: NativeType.small)
+```
+
+#### 📢 Banner Ad Widget
+```dart
+// 1. Standard Adaptive Banner
+const BannerAdWidget(type: BannerType.adaptive)
+
+// 2. Collapsible Banner (opens expanded and collapses)
+const BannerAdWidget(
+  type: BannerType.collapsible,
+  collapsiblePosition: "bottom", // or "top"
+)
+
+// 3. Inline Adaptive Banner (for ListView/RecyclerView)
+const BannerAdWidget(
+  type: BannerType.inline,
+  maxHeightDp: 100,
+)
+
+// 4. Medium Rectangle Banner (MREC 300x250)
+const BannerAdWidget(type: BannerType.mrec)
+```
+
+### 5. Flutter Ad Actions
+
+#### 🎬 Show Interstitial Ad (with Frequency Count)
+```dart
+AdsManager.showInterstitial(
+  count: 1, // 1 = Every click, 2 = Every 2nd click, etc.
+  onComplete: () {
+    // Action / Navigate to next screen
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const NextScreen()));
+  },
+);
+```
+
+#### 🎁 Show Rewarded Ad
+```dart
+AdsManager.showRewarded(
+  onEarned: (amount, type) {
+    print("User earned reward: $amount $type");
+  },
+  onClosed: () {
+    print("Ad closed");
+  },
+);
+```
+
+#### 🚀 Splash App Open Ad
+```dart
+AdsManager.loadAndShowSplashAppOpenAd(
+  timeoutMs: 6000,
+  onComplete: () {
+    // Navigate from Splash to HomeScreen
+  },
+);
+```
+
+#### 🛡️ Private DNS (AdBlocker) Check in Flutter
+```dart
+bool isDnsOn = await AdsManager.isDNS();
+if (isDnsOn) {
+  // Private DNS (AdGuard / NextDNS / AdBlock) is ON!
+}
+```
+
+#### 💎 Set Premium Mode in Flutter
+```dart
+// Turn ON Premium -> Instantly removes all ads & shimmers
+await AdsManager.isPremium(true);
+
+// Check if user is premium
+bool isPremium = await AdsManager.isPremium();
+```
+
+---
+
+# 🤖 Native Android Integration Guide
+
+### 1. Add JitPack in `settings.gradle`
 ```groovy
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' } // <-- Add this line
+        maven { url 'https://jitpack.io' }
     }
 }
 ```
 
-### Step 2: Add the dependency
-In your app's `build.gradle` (or `build.gradle.kts`):
-
+### 2. Add Dependency in app `build.gradle`
 ```groovy
 dependencies {
     implementation 'com.github.rencho10master-beep:AdsManager:1.0.0'
 }
 ```
 
----
-
-## ⚙️ 2. AndroidManifest.xml Setup
-
-Add your AdMob App ID inside the `<application>` tag:
-
-```xml
-<manifest>
-    <application>
-        <!-- AdMob App ID -->
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy" />
-    </application>
-</manifest>
-```
-
----
-
-## 🚀 3. Initialize in Application Class
-
-In your `Application` class, configure only the Ad IDs your app needs (all other IDs are optional and will safely never crash):
-
+### 3. Initialize in `Application` class
 ```kotlin
 class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Example 1: Full Configuration with Custom Colors & Dialog Styling
         val config = AdsConfig(
             appId = "ca-app-pub-3940256099942544~3347511713",
             bannerId = "ca-app-pub-3940256099942544/6300978111",
@@ -70,208 +192,89 @@ class MyApplication : Application() {
             rewardedId = "ca-app-pub-3940256099942544/5224354917",
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
             resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
-
-            // 🎨 Custom Shimmer Colors
             shimmerBaseColor = Color.parseColor("#E0E0E0"),
-            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
-
-            // ⏳ Custom Ad Loading Dialog (shown before Interstitial & Resume App Open)
-            dialogBackgroundColor = Color.parseColor("#CC000000"), // Background overlay color
-            dialogTextColor = Color.WHITE,                         // Loading text color
-            dialogProgressColor = Color.WHITE,                     // Spinner/Progress color
-            dialogLoadingText = "Ad is loading…",                  // Message
-            showDialogProgressBar = true                           // Enable/disable spinner
+            shimmerHighlightColor = Color.parseColor("#F5F5F5")
         )
 
-        // Example 2: If your app ONLY uses Interstitial Ad (zero crash guarantee for unadded IDs)
-        /*
-        val config = AdsConfig(
-            appId = "ca-app-pub-3940256099942544~3347511713",
-            interstitialId = "ca-app-pub-3940256099942544/1033173712"
-        )
-        */
-
-        // enableResumeAppOpenAd = true automatically handles background-to-foreground ads
-        AdsManager.init(this, config, enableResumeAppOpenAd = true)
+        AdsManager.init(this, config)
     }
 }
 ```
 
----
+### 4. Dedicated Custom Views in XML (Shows Live Mockups in Android Studio Preview!)
 
-## 🛡️ 4. Private DNS Detection (`isDNS`)
-
-Detect if the user has Private DNS (AdBlock DNS, AdGuard, NextDNS) turned ON on their device:
-
-```kotlin
-// Check anywhere using Context:
-if (AdsManager.isDNS(this)) {
-    // Private DNS is ON (Blocking Ads)
-    // Show dialog to ask user to turn off Private DNS or buy Premium!
-} else {
-    // Private DNS is OFF (Normal flow)
-}
-
-// Or using property (after AdsManager.init):
-if (AdsManager.isDNS) {
-    // DNS is ON
-}
-```
-
----
-
-## ⏱️ 5. Splash Screen App Open Ad
-
-Loads and shows App Open Ad with timeout safety. If ad fails or takes too long, the `{ ... }` callback fires automatically so splash screen never freezes:
-
-```kotlin
-class SplashActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
-
-        // 5-second timeout safety
-        AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 5000L) {
-            // Callback fires after ad closes, fails, or if user is Premium:
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
-    }
-}
-```
-
----
-
-## 🎯 6. Interstitial Ads (with Click Count)
-
-Shows Interstitial Ad with frequency count. The callback `{ ... }` **always executes** when ad closes, fails to load, or if user is premium:
-
-```kotlin
-// Har vakhte show karva mate (Count = 1):
-AdsManager.showInterstitial(this, 1) {
-    // Navigate or perform action
-    startActivity(Intent(this, DetailActivity::class.java))
-}
-
-// Dar 2ji var show karva mate (Count = 2):
-AdsManager.showInterstitial(this, 2) {
-    startActivity(Intent(this, DetailActivity::class.java))
-}
-
-// Dar 3ji var show karva mate (Count = 3):
-AdsManager.showInterstitial(this, 3) {
-    startActivity(Intent(this, DetailActivity::class.java))
-}
-```
-
----
-
-## 🖼️ 7. Native Ads (Dedicated Custom XML Views)
-
-Just like `androidx.recyclerview.widget.RecyclerView`, you can directly use our library's custom Native Ad views in your XML layouts. They **automatically display realistic ad previews inside Android Studio's Layout Editor**!
-
-### Step 1: Add Custom View to your XML Layout
+#### 🖼️ Large Native Ad View
 ```xml
-<!-- 1. Large Native Ad (with MediaView, Icon, Headline, Body & Shimmer) -->
 <com.ads.manager.nativead.LargeNativeAdView
-    android:id="@+id/largeNativeAd"
+    android:id="@+id/largeNativeAdView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp" />
-
-<!-- 2. Small Native Ad (Compact - no MediaView, ideal for bottom or lists) -->
-<com.ads.manager.nativead.SmallNativeAdView
-    android:id="@+id/smallNativeAd"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp" />
+    android:layout_height="wrap_content" />
 ```
-
-### Step 2: Load Ad in Kotlin Code (Just 1 Line!)
+Load in Kotlin:
 ```kotlin
-// Load Large Native Ad:
-binding.largeNativeAd.load(this)
-
-// Load Small Native Ad:
-binding.smallNativeAd.load(this)
-
-// Or load via AdsManager:
-AdsManager.showNative(this, binding.largeNativeAd)
-AdsManager.showNativeSmall(this, binding.smallNativeAd)
+binding.largeNativeAdView.load(this)
 ```
 
----
-
-## 📱 8. Banner Ads (Dedicated Custom XML View)
-
-### Step 1: Add Custom BannerAdView in your XML Layout
+#### 🖼️ Small Native Ad View
 ```xml
-<!-- Standard Adaptive Banner at Bottom -->
+<com.ads.manager.nativead.SmallNativeAdView
+    android:id="@+id/smallNativeAdView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+```
+Load in Kotlin:
+```kotlin
+binding.smallNativeAdView.load(this)
+```
+
+#### 📢 Dedicated Banner View
+```xml
+<!-- Adaptive Banner -->
 <com.ads.manager.banner.BannerAdView
     android:id="@+id/bannerAdView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom" />
+    app:bannerType="adaptive" />
+
+<!-- Collapsible Banner -->
+<com.ads.manager.banner.BannerAdView
+    android:id="@+id/collapsibleBannerView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:bannerType="collapsible" />
 ```
-
-### Step 2: Load Banner in Kotlin Code
-
+Load in Kotlin:
 ```kotlin
-// 1. Standard Adaptive Banner:
 binding.bannerAdView.load(this)
-
-// 2. Collapsible Banner (High CTR - expands on display):
-binding.bannerAdView.loadCollapsible(this, position = "bottom") // or "top"
-
-// 3. Inline Adaptive Banner (for RecyclerView or Scrollable lists):
-binding.bannerAdView.loadInline(this, maxHeightDp = 100)
-
-// 4. Medium Rectangle Banner (MREC 300x250):
-binding.bannerAdView.loadMediumRectangle(this)
 ```
 
----
+### 5. Native Android Ad Actions
 
-## 🎁 9. Rewarded Ads
-
+#### 🎬 Show Interstitial Ad (Always calls callback on close, fail, or skip)
 ```kotlin
-AdsManager.showRewarded(
-    activity = this,
-    onEarned = { reward ->
-        Toast.makeText(this, "Reward: ${reward.amount} ${reward.type}", Toast.LENGTH_SHORT).show()
-    },
-    onClosed = {
-        // User closed ad
-    }
-)
-```
-
----
-
-## 👑 10. Premium / VIP User Mode (Disable All Ads)
-
-When user purchases subscription in PremiumActivity:
-
-```kotlin
-// Option 1: Function (Set Premium status)
-AdsManager.isPremium(true)  // Instantly disables and removes all ads & shimmers!
-AdsManager.isPremium(false) // Normal free mode
-
-// Check Premium status anywhere:
-if (AdsManager.isPremium()) {
-    // User is Premium
+AdsManager.showInterstitial(this, count = 1) {
+    // Next Screen / Action
+    startActivity(Intent(this, DetailActivity::class.java))
 }
-
-// Option 2: Disable Ads function
-AdsManager.setAdsEnabled(false) // Turns off all ads
 ```
 
-// Option 3: Disable Ads function
-AdsManager.setAdsEnabled(false)
+#### 🛡️ Private DNS Detection
+```kotlin
+if (AdsManager.isDNS(this)) {
+    // User has AdBlock Private DNS active
+}
 ```
 
-### What happens when Premium is enabled:
-- Instantly dismisses any open loading dialogs.
-- Kills all pending ad requests.
-- Native & Banner containers immediately become `GONE` (no blank spaces or shimmer).
-- Interstitial & Splash callbacks fire immediately without any delay.
+#### 💎 Instant Premium Toggle
+```kotlin
+// Instantly kills all ads and dismisses dialogs
+AdsManager.isPremium(true)
+
+// Check status
+val isVip = AdsManager.isPremium()
+```
+
+---
+
+## ⚡ License
+MIT License. Free to use in commercial and personal projects.

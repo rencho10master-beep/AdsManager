@@ -1,0 +1,20 @@
+name: ads_manager
+description: "Ultimate AdMob Ads Manager for Android & Flutter with Shimmer, Private DNS detection, and Native/Banner Widgets."
+version: 1.0.0
+homepage: https://github.com/rencho10master-beep/AdsManager
+repository: https://github.com/rencho10master-beep/AdsManager
+
+environment:
+  sdk: ">=2.17.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: com.ads.manager.flutter
+        pluginClass: AdsManagerFlutterPlugin

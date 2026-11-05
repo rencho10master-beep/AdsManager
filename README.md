@@ -3,7 +3,7 @@
 [![](https://jitpack.io/v/rencho10master-beep/AdsManager.svg)](https://jitpack.io/#rencho10master-beep/AdsManager)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 [![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-02569B.svg?style=flat&logo=flutter)](https://flutter.dev)
-[![CompileSdk](https://img.shields.io/badge/compileSdk-37-blue.svg)](https://developer.android.com)
+[![CompileSdk](https://img.shields.io/badge/compileSdk-35-blue.svg)](https://developer.android.com)
 
 A high-performance AdMob Ads Library designed to work seamlessly across both **Native Android** and **Flutter**.
 
@@ -41,7 +41,7 @@ In your app's `build.gradle` (or `build.gradle.kts`):
 
 ```groovy
 dependencies {
-    implementation 'com.github.rencho10master-beep:AdsManager:1.0.0'
+    implementation 'com.github.rencho10master-beep:AdsManager:1.0.1'
 }
 ```
 

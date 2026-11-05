@@ -60,10 +60,24 @@ void main() async {
       splashAppOpenId: "ca-app-pub-3940256099942544/9257395921",
       resumeAppOpenId: "ca-app-pub-3940256099942544/9257395921",
 
-      // Optional: Shimmer colors & Dialog styling
+      // 🎨 Custom Shimmer Colors
       shimmerBaseColor: "#E0E0E0",
       shimmerHighlightColor: "#F5F5F5",
+
+      // ⏳ Custom Ad Loading Dialog
+      dialogBackgroundColor: "#CC000000",
+      dialogTextColor: "#FFFFFF",
       dialogLoadingText: "Ad is loading...",
+
+      // 🎨 Native Ad Complete Styling Customization
+      nativeBackgroundColor: "#FFFFFF",     // Native Ad Card BG color
+      nativeHeadlineColor: "#000000",        // Title/Headline text color
+      nativeBodyColor: "#666666",            // Body text color
+      nativeAdBadgeBgColor: "#FFCC00",       // "Ad" badge background
+      nativeAdBadgeTextColor: "#000000",     // "Ad" badge text color
+      nativeCtaBgColor: "#1A73E8",           // Install button background color
+      nativeCtaTextColor: "#FFFFFF",         // Install button text color
+      nativeFontFamilyName: "sans-serif",    // Font family for all ad text
     ),
   );
 
@@ -192,8 +206,20 @@ class MyApplication : Application() {
             rewardedId = "ca-app-pub-3940256099942544/5224354917",
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
             resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
+
+            // 🎨 Shimmer Colors
             shimmerBaseColor = Color.parseColor("#E0E0E0"),
-            shimmerHighlightColor = Color.parseColor("#F5F5F5")
+            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
+
+            // 🎨 Native Ad Complete Customization
+            nativeBackgroundColor = Color.WHITE,                   // Native Ad Background
+            nativeHeadlineColor = Color.BLACK,                     // Headline / Title text color
+            nativeBodyColor = Color.parseColor("#666666"),         // Body text color
+            nativeAdBadgeBgColor = Color.parseColor("#FFCC00"),    // "Ad" badge background
+            nativeAdBadgeTextColor = Color.BLACK,                  // "Ad" badge text color
+            nativeCtaBgColor = Color.parseColor("#1A73E8"),        // Install button background color
+            nativeCtaTextColor = Color.WHITE,                      // Install button text color
+            nativeFontFamily = Typeface.DEFAULT_BOLD               // Custom Typeface / Font
         )
 
         AdsManager.init(this, config)

@@ -18,6 +18,16 @@ class AdsConfig {
   final String? dialogLoadingText;
   final bool? showDialogProgressBar;
 
+  /// Native Ad Styling Customization (HEX strings like "#FFFFFF", "#000000", "#FFCC00")
+  final String? nativeBackgroundColor;
+  final String? nativeHeadlineColor;
+  final String? nativeBodyColor;
+  final String? nativeAdBadgeBgColor;
+  final String? nativeAdBadgeTextColor;
+  final String? nativeCtaBgColor;
+  final String? nativeCtaTextColor;
+  final String? nativeFontFamilyName;
+
   const AdsConfig({
     this.appId = "",
     this.bannerId = "",
@@ -33,6 +43,14 @@ class AdsConfig {
     this.dialogTextColor,
     this.dialogLoadingText,
     this.showDialogProgressBar,
+    this.nativeBackgroundColor,
+    this.nativeHeadlineColor,
+    this.nativeBodyColor,
+    this.nativeAdBadgeBgColor,
+    this.nativeAdBadgeTextColor,
+    this.nativeCtaBgColor,
+    this.nativeCtaTextColor,
+    this.nativeFontFamilyName,
   });
 
   Map<String, dynamic> toMap() {
@@ -51,6 +69,14 @@ class AdsConfig {
       if (dialogTextColor != null) 'dialogTextColor': dialogTextColor,
       if (dialogLoadingText != null) 'dialogLoadingText': dialogLoadingText,
       if (showDialogProgressBar != null) 'showDialogProgressBar': showDialogProgressBar,
+      if (nativeBackgroundColor != null) 'nativeBackgroundColor': nativeBackgroundColor,
+      if (nativeHeadlineColor != null) 'nativeHeadlineColor': nativeHeadlineColor,
+      if (nativeBodyColor != null) 'nativeBodyColor': nativeBodyColor,
+      if (nativeAdBadgeBgColor != null) 'nativeAdBadgeBgColor': nativeAdBadgeBgColor,
+      if (nativeAdBadgeTextColor != null) 'nativeAdBadgeTextColor': nativeAdBadgeTextColor,
+      if (nativeCtaBgColor != null) 'nativeCtaBgColor': nativeCtaBgColor,
+      if (nativeCtaTextColor != null) 'nativeCtaTextColor': nativeCtaTextColor,
+      if (nativeFontFamilyName != null) 'nativeFontFamilyName': nativeFontFamilyName,
     };
   }
 }

@@ -21,5 +21,16 @@ data class AdsConfig(
     @param:ColorInt val dialogTextColor: Int = Color.WHITE,
     @param:ColorInt val dialogProgressColor: Int = Color.WHITE,
     val dialogLoadingText: String = "Ad is loading…",
-    val showDialogProgressBar: Boolean = true
+    val showDialogProgressBar: Boolean = true,
+
+    // Native Ad Styling Customization
+    @param:ColorInt val nativeBackgroundColor: Int? = null,
+    @param:ColorInt val nativeHeadlineColor: Int? = null,
+    @param:ColorInt val nativeBodyColor: Int? = null,
+    @param:ColorInt val nativeAdBadgeBgColor: Int? = null,
+    @param:ColorInt val nativeAdBadgeTextColor: Int? = null,
+    @param:ColorInt val nativeCtaBgColor: Int? = null,
+    @param:ColorInt val nativeCtaTextColor: Int? = null,
+    val nativeFontFamily: android.graphics.Typeface? = null,
+    val nativeFontFamilyName: String? = null
 )

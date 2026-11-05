@@ -58,7 +58,17 @@ class AdsManagerFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
                     dialogProgressColor = parseColor(configMap["dialogProgressColor"] as? String, "#FFFFFF"),
                     dialogTextColor = parseColor(configMap["dialogTextColor"] as? String, "#FFFFFF"),
                     dialogLoadingText = (configMap["dialogLoadingText"] as? String) ?: "Loading ad...",
-                    showDialogProgressBar = (configMap["showDialogProgressBar"] as? Boolean) ?: true
+                    showDialogProgressBar = (configMap["showDialogProgressBar"] as? Boolean) ?: true,
+
+                    // Native Ad Styling Customization
+                    nativeBackgroundColor = parseOptionalColor(configMap["nativeBackgroundColor"] as? String),
+                    nativeHeadlineColor = parseOptionalColor(configMap["nativeHeadlineColor"] as? String),
+                    nativeBodyColor = parseOptionalColor(configMap["nativeBodyColor"] as? String),
+                    nativeAdBadgeBgColor = parseOptionalColor(configMap["nativeAdBadgeBgColor"] as? String),
+                    nativeAdBadgeTextColor = parseOptionalColor(configMap["nativeAdBadgeTextColor"] as? String),
+                    nativeCtaBgColor = parseOptionalColor(configMap["nativeCtaBgColor"] as? String),
+                    nativeCtaTextColor = parseOptionalColor(configMap["nativeCtaTextColor"] as? String),
+                    nativeFontFamilyName = configMap["nativeFontFamilyName"] as? String
                 )
 
                 AdsManager.init(act.application, config, enableResumeAppOpenAd)
@@ -141,6 +151,15 @@ class AdsManagerFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
             Color.parseColor(colorStr ?: defaultColorHex)
         } catch (_: Exception) {
             Color.parseColor(defaultColorHex)
+        }
+    }
+
+    private fun parseOptionalColor(colorStr: String?): Int? {
+        if (colorStr.isNullOrBlank()) return null
+        return try {
+            Color.parseColor(colorStr)
+        } catch (_: Exception) {
+            null
         }
     }
 

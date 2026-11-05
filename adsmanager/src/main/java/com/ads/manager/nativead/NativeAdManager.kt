@@ -217,27 +217,62 @@ class NativeAdManager(private val config: AdsConfig) {
         val callToActionView = adView.findViewById<Button>(R.id.adCallToAction) ?: adView.findViewWithTag("adCallToAction")
         val iconView = adView.findViewById<ImageView>(R.id.adAppIcon) ?: adView.findViewWithTag("adAppIcon")
         val mediaView = adView.findViewById<MediaView>(R.id.adMedia) ?: adView.findViewWithTag("adMedia")
+        val attributionView = adView.findViewById<TextView>(R.id.adAttribution) ?: adView.findViewWithTag("adAttribution")
 
+        // 1. Root Native Ad Background Color
+        config.nativeBackgroundColor?.let { bgColor ->
+            adView.setBackgroundColor(bgColor)
+        }
+
+        // 2. Typeface / Font Family
+        val resolvedTypeface: android.graphics.Typeface? = config.nativeFontFamily
+            ?: config.nativeFontFamilyName?.let {
+                try {
+                    android.graphics.Typeface.create(it, android.graphics.Typeface.NORMAL)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+
+        // 3. Headline Styling
         headlineView?.let {
             it.text = nativeAd.headline
+            config.nativeHeadlineColor?.let { color -> it.setTextColor(color) }
+            resolvedTypeface?.let { tf -> it.typeface = tf }
             adView.headlineView = it
         }
 
+        // 4. Body Styling
         bodyView?.let {
             if (nativeAd.body.isNullOrEmpty()) {
                 it.visibility = View.GONE
             } else {
                 it.text = nativeAd.body
+                config.nativeBodyColor?.let { color -> it.setTextColor(color) }
+                resolvedTypeface?.let { tf -> it.typeface = tf }
                 it.visibility = View.VISIBLE
             }
             adView.bodyView = it
         }
 
+        // 5. "Ad" Badge Attribution Styling
+        attributionView?.let {
+            config.nativeAdBadgeBgColor?.let { color -> it.setBackgroundColor(color) }
+            config.nativeAdBadgeTextColor?.let { color -> it.setTextColor(color) }
+            resolvedTypeface?.let { tf -> it.typeface = tf }
+        }
+
+        // 6. Call To Action (Install/Open) Button Styling
         callToActionView?.let {
             if (nativeAd.callToAction.isNullOrEmpty()) {
                 it.visibility = View.GONE
             } else {
                 it.text = nativeAd.callToAction
+                config.nativeCtaBgColor?.let { color ->
+                    it.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
+                }
+                config.nativeCtaTextColor?.let { color -> it.setTextColor(color) }
+                resolvedTypeface?.let { tf -> it.typeface = tf }
                 it.visibility = View.VISIBLE
             }
             adView.callToActionView = it

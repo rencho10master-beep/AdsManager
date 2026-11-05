@@ -1,23 +1,26 @@
-# AdsManager (Android & Flutter Dual Library) 🚀
+# AdsManager (Android & Flutter Unified Library) 🚀
 
 [![](https://jitpack.io/v/rencho10master-beep/AdsManager.svg)](https://jitpack.io/#rencho10master-beep/AdsManager)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=21)
 [![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-02569B.svg?style=flat&logo=flutter)](https://flutter.dev)
 [![CompileSdk](https://img.shields.io/badge/compileSdk-37-blue.svg)](https://developer.android.com)
 
-A single unified AdMob Ads library that works seamlessly for **Native Android (Kotlin/Java & Custom XML Views)** and **Flutter (Dart & Pure Widgets - ZERO XML needed!)**.
+A high-performance AdMob Ads Library designed to work seamlessly across both **Native Android** and **Flutter**.
 
 ---
 
-## 📑 Quick Navigation
-- [🤖 Native Android Integration Guide (Kotlin & XML)](#-native-android-integration-guide)
-- [🐦 Flutter Integration Guide (Dart & Widgets)](#-flutter-integration-guide)
-- [🛡️ Private DNS (AdBlock) Detection](#-private-dns-adblock-detection)
-- [💎 Instant Premium Mode](#-instant-premium-mode)
+## 📑 Select Your Platform:
+- [🤖 SECTION 1: NATIVE ANDROID COMPLETE GUIDE (Kotlin/Java & XML)](#-section-1-native-android-complete-guide)
+- [🐦 SECTION 2: FLUTTER COMPLETE GUIDE (Dart & Pure Widgets)](#-section-2-flutter-complete-guide)
 
 ---
+---
 
-# 🤖 Native Android Integration Guide
+# 🤖 SECTION 1: NATIVE ANDROID COMPLETE GUIDE
+
+Complete guide for Native Android projects using Kotlin/Java and dedicated XML custom views.
+
+---
 
 ### 1. Add JitPack in `settings.gradle`
 In your root `settings.gradle` (or `settings.gradle.kts`):
@@ -42,22 +45,20 @@ dependencies {
 }
 ```
 
-### 3. Configure `AndroidManifest.xml`
-Add your AdMob App ID inside the `<application>` tag:
-
+### 3. Add AdMob App ID in `AndroidManifest.xml`
 ```xml
 <manifest>
     <application>
-        <!-- AdMob App ID -->
+        <!-- Your AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-xxxxxxxxxxxxxxxx~yyyyyyyyyy" />
+            android:value="ca-app-pub-3940256099942544~3347511713" />
     </application>
 </manifest>
 ```
 
-### 4. Initialize in `Application` class
-In your `Application` class, configure only the Ad IDs you need (omitted IDs will safely not crash):
+### 4. Initialize in `Application` Class
+Configure only the Ad IDs you need in your `Application` class. Omitted IDs safely default to blank without crashes:
 
 ```kotlin
 class MyApplication : Application() {
@@ -73,26 +74,26 @@ class MyApplication : Application() {
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
             resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
 
-            // 🎨 Shimmer Colors
+            // 🎨 Shimmer Colors (Optional - defaults to clean light grey)
             shimmerBaseColor = Color.parseColor("#E0E0E0"),
             shimmerHighlightColor = Color.parseColor("#F5F5F5"),
 
-            // ⏳ Custom Ad Loading Dialog
+            // ⏳ Ad Loading Dialog Styling (Optional)
             dialogBackgroundColor = Color.parseColor("#CC000000"),
             dialogTextColor = Color.WHITE,
             dialogLoadingText = "Ad is loading…",
 
-            // 🎨 Native Ad Complete Customization
+            // 🎨 Native Ad Complete Styling (Optional)
             nativeBackgroundColor = Color.WHITE,                   // Native Ad Background
             nativeHeadlineColor = Color.BLACK,                     // Headline / Title text color
-            nativeBodyColor = Color.parseColor("#666666"),         // Body text color
+            nativeBodyColor = Color.parseColor("#666666"),         // Body description text color
             nativeAdBadgeBgColor = Color.parseColor("#FFCC00"),    // "Ad" badge background
             nativeAdBadgeTextColor = Color.BLACK,                  // "Ad" badge text color
             nativeCtaBgColor = Color.parseColor("#1A73E8"),        // Install button background color
             nativeCtaTextColor = Color.WHITE,                      // Install button text color
 
-            // 🔤 Font Family from res/font/ folder (e.g. res/font/my_font.ttf)
-            nativeFontResId = R.font.my_font                       // Pass R.font directly!
+            // 🔤 Custom Font from res/font/ folder (Optional)
+            nativeFontResId = R.font.my_font                       // Directly pass your R.font!
         )
 
         AdsManager.init(this, config)
@@ -100,21 +101,25 @@ class MyApplication : Application() {
 }
 ```
 
-### 5. Dedicated Custom Views in XML (Shows Live Mockups in Android Studio Preview!)
+---
 
-#### 🖼️ Large Native Ad View
+### 5. XML Custom Views (With Live Mockup in Android Studio Preview!)
+
+#### A. Large Native Ad View (Full MediaView + Icon + Headline + Body + Install button)
+In your XML layout:
 ```xml
 <com.ads.manager.nativead.LargeNativeAdView
     android:id="@+id/largeNativeAdView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
 ```
-Load in Kotlin:
+Load in Kotlin (`Activity` or `Fragment`):
 ```kotlin
 binding.largeNativeAdView.load(this)
 ```
 
-#### 🖼️ Small Native Ad View
+#### B. Small Native Ad View (Compact layout ideal for lists & bottom cards)
+In your XML layout:
 ```xml
 <com.ads.manager.nativead.SmallNativeAdView
     android:id="@+id/smallNativeAdView"
@@ -126,9 +131,10 @@ Load in Kotlin:
 binding.smallNativeAdView.load(this)
 ```
 
-#### 📢 Dedicated Banner View
+#### C. Dedicated Banner View (Adaptive & Collapsible)
+In your XML layout:
 ```xml
-<!-- Adaptive Banner -->
+<!-- Standard Adaptive Banner -->
 <com.ads.manager.banner.BannerAdView
     android:id="@+id/bannerAdView"
     android:layout_width="match_parent"
@@ -147,35 +153,84 @@ Load in Kotlin:
 binding.bannerAdView.load(this)
 ```
 
-### 6. Native Android Ad Actions
+---
 
-#### 🎬 Show Interstitial Ad (Always calls callback on close, fail, or skip)
+### 6. Android Ad Actions in Kotlin
+
+#### 🎬 Show Interstitial Ad (Always calls callback on close, skip, or fail)
 ```kotlin
+// count = 1: Shows every click
+// count = 2: Shows every 2nd click
 AdsManager.showInterstitial(this, count = 1) {
-    // Next Screen / Action
-    startActivity(Intent(this, DetailActivity::class.java))
+    // Action / Next Screen
+    startActivity(Intent(this, NextActivity::class.java))
 }
 ```
 
-#### 🛡️ Private DNS Detection
+#### 📢 Load Banner Programmatically (Optional without XML custom view)
 ```kotlin
+// 1. Adaptive Banner
+AdsManager.showBanner(this, binding.bannerContainer)
+
+// 2. Collapsible Banner (bottom or top)
+AdsManager.showCollapsibleBanner(this, binding.bannerContainer, position = "bottom")
+
+// 3. Inline Banner (for RecyclerView)
+AdsManager.showInlineBanner(this, binding.bannerContainer, maxHeightDp = 100)
+
+// 4. Medium Rectangle (MREC 300x250)
+AdsManager.showMediumRectangleBanner(this, binding.bannerContainer)
+```
+
+#### 🎁 Show Rewarded Ad
+```kotlin
+AdsManager.showRewarded(
+    this,
+    onEarned = { reward ->
+        Toast.makeText(this, "Reward earned: ${reward.amount}", Toast.LENGTH_SHORT).show()
+    },
+    onClosed = {
+        // Continue game / next action
+    }
+)
+```
+
+#### 🚀 Splash App Open Ad
+```kotlin
+AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 6000L) {
+    // Navigate from Splash to MainActivity
+    startActivity(Intent(this, MainActivity::class.java))
+    finish()
+}
+```
+
+#### 🛡️ Private DNS (AdBlock) Detection
+```kotlin
+// Returns true if AdBlock Private DNS (AdGuard, NextDNS) is active, false otherwise
 if (AdsManager.isDNS(this)) {
-    // User has AdBlock Private DNS active
+    // Show dialog or alert user to turn off Private DNS
 }
 ```
 
-#### 💎 Instant Premium Toggle
+#### 💎 Instant Premium Mode (Turns OFF all ads & shimmers)
 ```kotlin
-// Instantly kills all ads and dismisses dialogs
+// Enable Premium
 AdsManager.isPremium(true)
 
 // Check status
-val isVip = AdsManager.isPremium()
+if (AdsManager.isPremium()) {
+    // User is Premium
+}
 ```
 
 ---
+---
 
-# 🐦 Flutter Integration Guide
+# 🐦 SECTION 2: FLUTTER COMPLETE GUIDE
+
+Complete guide for Flutter projects. **ZERO XML REQUIRED!** Pure Dart code and native Flutter widgets.
+
+---
 
 ### 1. Add Dependency in Flutter `pubspec.yaml`
 ```yaml
@@ -187,7 +242,7 @@ dependencies:
       url: https://github.com/rencho10master-beep/AdsManager.git
 ```
 
-### 2. Configure `android/app/src/main/AndroidManifest.xml`
+### 2. Add AdMob App ID in `android/app/src/main/AndroidManifest.xml`
 ```xml
 <manifest>
     <application>
@@ -218,19 +273,19 @@ void main() async {
       splashAppOpenId: "ca-app-pub-3940256099942544/9257395921",
       resumeAppOpenId: "ca-app-pub-3940256099942544/9257395921",
 
-      // 🎨 Custom Shimmer Colors
+      // 🎨 Custom Shimmer Colors (Optional)
       shimmerBaseColor: "#E0E0E0",
       shimmerHighlightColor: "#F5F5F5",
 
-      // ⏳ Custom Ad Loading Dialog
+      // ⏳ Custom Loading Dialog (Optional)
       dialogBackgroundColor: "#CC000000",
       dialogTextColor: "#FFFFFF",
       dialogLoadingText: "Ad is loading...",
 
-      // 🎨 Native Ad Complete Styling Customization
-      nativeBackgroundColor: "#FFFFFF",     // Native Ad Card BG color
-      nativeHeadlineColor: "#000000",        // Title/Headline text color
-      nativeBodyColor: "#666666",            // Body text color
+      // 🎨 Native Ad Complete Styling (Optional)
+      nativeBackgroundColor: "#FFFFFF",     // Native card background
+      nativeHeadlineColor: "#000000",        // Title text color
+      nativeBodyColor: "#666666",            // Description text color
       nativeAdBadgeBgColor: "#FFCC00",       // "Ad" badge background
       nativeAdBadgeTextColor: "#000000",     // "Ad" badge text color
       nativeCtaBgColor: "#1A73E8",           // Install button background color
@@ -243,14 +298,16 @@ void main() async {
 }
 ```
 
-### 4. Flutter Widgets (Zero XML! Pure Dart Widgets)
+---
 
-#### 🖼️ Native Ad Widget (Large & Small)
+### 4. Flutter Widgets (Pure Dart Widgets - ZERO XML!)
+
+#### 🖼️ Native Ad Widget (With Custom Shimmer & Auto Ad Binding)
 ```dart
-// 1. Large Native Ad (with MediaView, App Icon, Headline, Body, Call-To-Action)
+// 1. Large Native Ad (Full MediaView + Icon + Headline + Body + Install button)
 const NativeAdWidget(type: NativeType.large)
 
-// 2. Small Native Ad (compact view for lists)
+// 2. Small Native Ad (Compact card for ListView items)
 const NativeAdWidget(type: NativeType.small)
 ```
 
@@ -259,13 +316,13 @@ const NativeAdWidget(type: NativeType.small)
 // 1. Standard Adaptive Banner
 const BannerAdWidget(type: BannerType.adaptive)
 
-// 2. Collapsible Banner (opens expanded and collapses)
+// 2. Collapsible Banner (opens expanded initially and collapses)
 const BannerAdWidget(
   type: BannerType.collapsible,
   collapsiblePosition: "bottom", // or "top"
 )
 
-// 3. Inline Adaptive Banner (for ListView/RecyclerView)
+// 3. Inline Adaptive Banner (for ListView/ScrollView)
 const BannerAdWidget(
   type: BannerType.inline,
   maxHeightDp: 100,
@@ -275,12 +332,14 @@ const BannerAdWidget(
 const BannerAdWidget(type: BannerType.mrec)
 ```
 
-### 5. Flutter Ad Actions
+---
 
-#### 🎬 Show Interstitial Ad (with Frequency Count)
+### 5. Flutter Ad Actions in Dart
+
+#### 🎬 Show Interstitial Ad (Always calls callback on close, skip, or fail)
 ```dart
 AdsManager.showInterstitial(
-  count: 1, // 1 = Every click, 2 = Every 2nd click, etc.
+  count: 1, // 1 = Every single click, 2 = Every 2nd click
   onComplete: () {
     // Action / Navigate to next screen
     Navigator.push(context, MaterialPageRoute(builder: (_) => const NextScreen()));
@@ -295,7 +354,7 @@ AdsManager.showRewarded(
     print("User earned reward: $amount $type");
   },
   onClosed: () {
-    print("Ad closed");
+    // Ad closed
   },
 );
 ```
@@ -306,25 +365,27 @@ AdsManager.loadAndShowSplashAppOpenAd(
   timeoutMs: 6000,
   onComplete: () {
     // Navigate from Splash to HomeScreen
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
   },
 );
 ```
 
 #### 🛡️ Private DNS (AdBlocker) Check in Flutter
 ```dart
+// Returns true if AdBlock DNS is active, false otherwise
 bool isDnsOn = await AdsManager.isDNS();
 if (isDnsOn) {
-  // Private DNS (AdGuard / NextDNS / AdBlock) is ON!
+  // Alert user
 }
 ```
 
 #### 💎 Set Premium Mode in Flutter
 ```dart
-// Turn ON Premium -> Instantly removes all ads & shimmers
+// Instantly kills all ads and shimmers
 await AdsManager.isPremium(true);
 
-// Check if user is premium
-bool isPremium = await AdsManager.isPremium();
+// Check premium status
+bool isVip = await AdsManager.isPremium();
 ```
 
 ---

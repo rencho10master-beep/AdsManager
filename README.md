@@ -45,7 +45,7 @@ In your app's `build.gradle` (or `build.gradle.kts`):
 
 ```groovy
 dependencies {
-    implementation 'com.github.rencho10master-beep:AdsManager:1.0.2'
+    implementation 'com.github.rencho10master-beep:AdsManager:1.0.3'
 }
 ```
 

@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ad_shimmer_base">#E0E0E0</color>
-    <color name="ad_shimmer_highlight">#F5F5F5</color>
+    <color name="ad_shimmer_base">#7A7A7A</color>
+    <color name="ad_shimmer_highlight">#B0B0B0</color>
+    <color name="ad_shimmer_color">#7A7A7A</color>
     <color name="ad_dialog_bg">#000000</color>
     <color name="ad_dialog_text">#FFFFFF</color>
-    <color name="ad_button_color">#2196F3</color>
+    <color name="ad_button_color">#FFA805</color>
     <color name="ad_button_text_color">#FFFFFF</color>
+    <color name="native_bg">#0B1220</color>
+    <color name="ad_text_primary">#FFFFFF</color>
+    <color name="ad_text_secondary">#CCCCCC</color>
 </resources>

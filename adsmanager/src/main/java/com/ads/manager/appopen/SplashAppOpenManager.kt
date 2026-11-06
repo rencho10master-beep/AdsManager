@@ -19,7 +19,7 @@ class SplashAppOpenManager(private val config: AdsConfig) {
     private var isAdLoading = false
 
     fun loadSplashAd(activity: Activity, onLoaded: (() -> Unit)? = null) {
-        if (AdsManager.isPremium() || config.splashAppOpenId.isBlank()) {
+        if (AdsManager.isPremium || config.splashAppOpenId.isBlank()) {
             onLoaded?.invoke()
             return
         }
@@ -54,7 +54,7 @@ class SplashAppOpenManager(private val config: AdsConfig) {
     }
 
     fun showSplashAd(activity: Activity, onComplete: () -> Unit) {
-        if (activity.isFinishing || activity.isDestroyed || AdsManager.isPremium() || config.splashAppOpenId.isBlank()) {
+        if (activity.isFinishing || activity.isDestroyed || AdsManager.isPremium || config.splashAppOpenId.isBlank()) {
             onComplete()
             return
         }
@@ -98,7 +98,7 @@ class SplashAppOpenManager(private val config: AdsConfig) {
         timeoutMs: Long = 6000L,
         onComplete: () -> Unit
     ) {
-        if (AdsManager.isPremium() || config.splashAppOpenId.isBlank()) {
+        if (AdsManager.isPremium || config.splashAppOpenId.isBlank()) {
             onComplete()
             return
         }

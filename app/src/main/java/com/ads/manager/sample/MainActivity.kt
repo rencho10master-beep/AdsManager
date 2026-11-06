@@ -16,7 +16,10 @@ class MainActivity : AppCompatActivity() {
 
         AdsManager.preloadAds(this)
         AdsManager.showBanner(this, binding.bannerContainer)
-        AdsManager.showNative(this, binding.nativeAdContainer)
+
+        // Voice style Small Native & Large Native
+        AdsManager.showSmallNative(this, binding.smallNativeContainer)
+        AdsManager.showLargeNative(this, binding.largeNativeContainer)
 
         binding.btnSplashAppOpen.setOnClickListener {
             AdsManager.loadAndShowSplashAppOpenAd(this, timeoutMs = 5000L) {
@@ -43,15 +46,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnTogglePremium.setOnClickListener {
-            val newStatus = !AdsManager.isPremium()
-            AdsManager.isPremium(newStatus)
-            val status = if (newStatus) "Premium (No Ads/Shimmer)" else "Free"
+            AdsManager.isPremium = !AdsManager.isPremium
+            val status = if (AdsManager.isPremium) "Premium (No Ads/Shimmer)" else "Free"
             binding.btnTogglePremium.text = "Toggle Premium (Current: $status)"
             Toast.makeText(this, "Status: $status", Toast.LENGTH_SHORT).show()
 
-            if (!newStatus) {
+            if (AdsManager.isPremium) {
                 AdsManager.showBanner(this, binding.bannerContainer)
-                AdsManager.showNative(this, binding.nativeAdContainer)
+                AdsManager.showSmallNative(this, binding.smallNativeContainer)
+                AdsManager.showLargeNative(this, binding.largeNativeContainer)
             }
         }
     }

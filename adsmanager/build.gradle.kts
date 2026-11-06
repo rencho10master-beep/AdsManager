@@ -5,11 +5,10 @@ plugins {
 
 android {
     namespace = "com.ads.manager"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
-        aarMetadata.minCompileSdk = 24
         consumerProguardFiles("consumer-rules.pro")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -35,7 +34,7 @@ afterEvaluate {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.github.rencho10master-beep"
+                groupId = "com.github.LionsLLC"
                 artifactId = "adsmanager"
                 version = "1.0.1"
             }
@@ -47,6 +46,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+
+    // SDP and SSP for responsive dimensions
+    implementation("com.intuit.sdp:sdp-android:1.1.1")
+    implementation("com.intuit.ssp:ssp-android:1.1.1")
 
     // Android Lifecycle Process
     implementation(libs.androidx.lifecycle.process)

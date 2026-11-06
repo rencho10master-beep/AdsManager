@@ -28,10 +28,25 @@ class CustomShimmerFrameLayout @JvmOverloads constructor(
         set(value) {
             field = value
             runOnMainThread {
+                applyColorToChildren(this, value)
                 updateGradient()
                 invalidate()
             }
         }
+
+    private fun applyColorToChildren(viewGroup: android.view.ViewGroup, color: Int) {
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is android.view.ViewGroup) {
+                if (child is androidx.cardview.widget.CardView) {
+                    child.setCardBackgroundColor(color)
+                }
+                applyColorToChildren(child, color)
+            } else if (child !is CustomShimmerFrameLayout) {
+                child.setBackgroundColor(color)
+            }
+        }
+    }
 
     @ColorInt
     var highlightColor: Int = "#F5F5F5".toColorInt()
@@ -120,6 +135,11 @@ class CustomShimmerFrameLayout @JvmOverloads constructor(
         } else {
             post(action)
         }
+    }
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        applyColorToChildren(this, baseColor)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

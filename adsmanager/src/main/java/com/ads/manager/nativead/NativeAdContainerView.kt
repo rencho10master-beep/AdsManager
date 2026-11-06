@@ -32,7 +32,7 @@ open class NativeAdContainerView @JvmOverloads constructor(
         val layoutRes = if (nativeType == 1) {
             R.layout.layout_small_native_ad
         } else {
-            R.layout.layout_default_native_ad
+            R.layout.layout_large_native_ad
         }
         LayoutInflater.from(context).inflate(layoutRes, this, true)
     }

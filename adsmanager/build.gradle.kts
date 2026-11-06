@@ -36,7 +36,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.LionsLLC"
                 artifactId = "adsmanager"
-                version = "1.0.1"
+                version = "1.0.2"
             }
         }
     }

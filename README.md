@@ -45,7 +45,7 @@ In your app's `build.gradle` (or `build.gradle.kts`):
 
 ```groovy
 dependencies {
-    implementation 'com.github.rencho10master-beep:AdsManager:1.0.1'
+    implementation 'com.github.rencho10master-beep:AdsManager:1.0.2'
 }
 ```
 
@@ -144,7 +144,33 @@ class MyApplication : Application() {
 
 ---
 
-### 7. XML Custom Views (With Live Mockup in Android Studio Preview!)
+### 7. Native Ads & Shimmer Layouts
+
+You can display Native Ads either via **Kotlin Functions** (with dedicated Shimmer) or via **XML Custom Views**:
+
+#### Method 1: Using Kotlin Functions (Voice-style Shimmer Included)
+```kotlin
+// 🔹 Large Native Ad (Voice-style Large Shimmer + Full MediaView Ad)
+AdsManager.showLargeNative(this, binding.largeNativeContainer)
+
+// 🔹 Small Native Ad (Voice-style Small Compact Shimmer + Compact Card Ad)
+AdsManager.showSmallNative(this, binding.smallNativeContainer)
+
+// 🔹 Generic Native with Custom Layout (Optional)
+AdsManager.showNative(
+    activity = this,
+    container = binding.customNativeContainer,
+    customShimmerResId = R.layout.layout_large_native_shimmer,
+    customAdLayoutResId = R.layout.layout_large_native_ad
+)
+```
+
+> [!TIP]
+> **Dynamic Shimmer Colors:** Both `SmallNative` and `LargeNative` shimmers automatically inherit the `shimmerBaseColor` and `shimmerHighlightColor` defined in your `AdsConfig`. If `isPremium = true`, the shimmer is instantly hidden and container visibility set to `GONE`.
+
+---
+
+### 8. XML Custom Views (With Live Mockup in Android Studio Preview!)
 
 #### A. Large Native Ad View (Full MediaView + Icon + Headline + Body + Install button)
 In your XML layout:

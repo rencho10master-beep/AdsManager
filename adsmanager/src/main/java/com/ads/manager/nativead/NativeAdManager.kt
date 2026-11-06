@@ -91,8 +91,7 @@ class NativeAdManager(private val config: AdsConfig) {
             ?: (shimmerLayout as? CustomShimmerFrameLayout)
 
         shimmerContainer?.let { shimmer ->
-            shimmer.baseColor = config.shimmerBaseColor
-            shimmer.highlightColor = config.shimmerHighlightColor
+            shimmer.shimmerColor = config.shimmerColor
             shimmer.startShimmer()
         }
 

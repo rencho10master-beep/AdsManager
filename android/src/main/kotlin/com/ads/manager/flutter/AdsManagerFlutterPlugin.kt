@@ -52,8 +52,10 @@ class AdsManagerFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware 
                     rewardedId = (configMap["rewardedId"] as? String) ?: "",
                     splashAppOpenId = (configMap["splashAppOpenId"] as? String) ?: "",
                     resumeAppOpenId = (configMap["resumeAppOpenId"] as? String) ?: "",
-                    shimmerBaseColor = parseColor(configMap["shimmerBaseColor"] as? String, "#E0E0E0"),
-                    shimmerHighlightColor = parseColor(configMap["shimmerHighlightColor"] as? String, "#F5F5F5"),
+                    shimmerColor = parseColor(
+                        (configMap["shimmerColor"] as? String) ?: (configMap["shimmerBaseColor"] as? String),
+                        "#E0E0E0"
+                    ),
                     dialogBackgroundColor = parseColor(configMap["dialogBackgroundColor"] as? String, "#B3000000"),
                     dialogProgressColor = parseColor(configMap["dialogProgressColor"] as? String, "#FFFFFF"),
                     dialogTextColor = parseColor(configMap["dialogTextColor"] as? String, "#FFFFFF"),

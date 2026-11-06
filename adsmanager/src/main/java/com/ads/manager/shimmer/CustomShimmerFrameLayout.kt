@@ -24,6 +24,14 @@ class CustomShimmerFrameLayout @JvmOverloads constructor(
     private var shimmerOffset = 0f
 
     @ColorInt
+    var shimmerColor: Int = "#E0E0E0".toColorInt()
+        set(value) {
+            field = value
+            baseColor = value
+            highlightColor = androidx.core.graphics.ColorUtils.blendARGB(value, android.graphics.Color.WHITE, 0.45f)
+        }
+
+    @ColorInt
     var baseColor: Int = "#E0E0E0".toColorInt()
         set(value) {
             field = value
@@ -71,8 +79,12 @@ class CustomShimmerFrameLayout @JvmOverloads constructor(
 
         attrs?.let {
             val typedArray = context.obtainStyledAttributes(it, R.styleable.ShimmerAdView)
-            baseColor = typedArray.getColor(R.styleable.ShimmerAdView_shimmerBaseColor, baseColor)
-            highlightColor = typedArray.getColor(R.styleable.ShimmerAdView_shimmerHighlightColor, highlightColor)
+            if (typedArray.hasValue(R.styleable.ShimmerAdView_shimmerColor)) {
+                shimmerColor = typedArray.getColor(R.styleable.ShimmerAdView_shimmerColor, shimmerColor)
+            } else {
+                baseColor = typedArray.getColor(R.styleable.ShimmerAdView_shimmerBaseColor, baseColor)
+                highlightColor = typedArray.getColor(R.styleable.ShimmerAdView_shimmerHighlightColor, highlightColor)
+            }
             duration = typedArray.getInt(R.styleable.ShimmerAdView_shimmerDuration, 1200).toLong()
             typedArray.recycle()
         }

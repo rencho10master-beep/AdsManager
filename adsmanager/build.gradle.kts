@@ -46,11 +46,11 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    implementation(libs.androidx.constraintlayout)
 
     // SDP and SSP for responsive dimensions
-    implementation("com.intuit.sdp:sdp-android:1.1.1")
-    implementation("com.intuit.ssp:ssp-android:1.1.1")
+    implementation(libs.sdp.android)
+    implementation(libs.ssp.android)
 
     // Android Lifecycle Process
     implementation(libs.androidx.lifecycle.process)

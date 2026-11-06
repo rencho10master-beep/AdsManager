@@ -7,7 +7,8 @@ class AdsConfig {
   final String splashAppOpenId;
   final String resumeAppOpenId;
 
-  /// Shimmer colors in HEX format (e.g. "#E0E0E0")
+  /// Shimmer color in HEX format (e.g. "#E0E0E0")
+  final String? shimmerColor;
   final String? shimmerBaseColor;
   final String? shimmerHighlightColor;
 
@@ -36,6 +37,7 @@ class AdsConfig {
     this.rewardedId = "",
     this.splashAppOpenId = "",
     this.resumeAppOpenId = "",
+    this.shimmerColor,
     this.shimmerBaseColor,
     this.shimmerHighlightColor,
     this.dialogBackgroundColor,
@@ -62,6 +64,7 @@ class AdsConfig {
       'rewardedId': rewardedId,
       'splashAppOpenId': splashAppOpenId,
       'resumeAppOpenId': resumeAppOpenId,
+      if (shimmerColor != null) 'shimmerColor': shimmerColor,
       if (shimmerBaseColor != null) 'shimmerBaseColor': shimmerBaseColor,
       if (shimmerHighlightColor != null) 'shimmerHighlightColor': shimmerHighlightColor,
       if (dialogBackgroundColor != null) 'dialogBackgroundColor': dialogBackgroundColor,

@@ -15,8 +15,11 @@ data class AdsConfig(
 
     val interstitialInterval: Int = 2,
 
-    // Shimmer Colors Customization
-    @param:ColorInt val shimmerBaseColor: Int = Color.parseColor("#E0E0E0"),
+    // Shimmer Color Customization (Single Color)
+    @param:ColorInt val shimmerColor: Int = Color.parseColor("#E0E0E0"),
+    @Deprecated("Use shimmerColor instead")
+    @param:ColorInt val shimmerBaseColor: Int = shimmerColor,
+    @Deprecated("Use shimmerColor instead")
     @param:ColorInt val shimmerHighlightColor: Int = Color.parseColor("#F5F5F5"),
 
     // Ad Loading Dialog Customization

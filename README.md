@@ -115,9 +115,8 @@ class MyApplication : Application() {
             splashAppOpenId = "ca-app-pub-3940256099942544/9257395921",
             resumeAppOpenId = "ca-app-pub-3940256099942544/9257395921",
 
-            // 🎨 Shimmer Colors (Optional - defaults to clean light grey)
-            shimmerBaseColor = Color.parseColor("#E0E0E0"),
-            shimmerHighlightColor = Color.parseColor("#F5F5F5"),
+            // 🎨 Shimmer Color (Single Color - defaults to clean light grey)
+            shimmerColor = Color.parseColor("#E0E0E0"),
 
             // ⏳ Ad Loading Dialog Styling (Optional)
             dialogBackgroundColor = Color.parseColor("#CC000000"),
@@ -356,9 +355,8 @@ void main() async {
       splashAppOpenId: "ca-app-pub-3940256099942544/9257395921",
       resumeAppOpenId: "ca-app-pub-3940256099942544/9257395921",
 
-      // 🎨 Custom Shimmer Colors (Optional)
-      shimmerBaseColor: "#E0E0E0",
-      shimmerHighlightColor: "#F5F5F5",
+      // 🎨 Custom Shimmer Color (Optional - defaults to "#E0E0E0")
+      shimmerColor: "#E0E0E0",
 
       // ⏳ Custom Loading Dialog (Optional)
       dialogBackgroundColor: "#CC000000",
